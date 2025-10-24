@@ -6,7 +6,7 @@
 //!PARAM float hue_center = 0.07 // ~25° (orange). 0..1 HSV-like hue
 //!PARAM float hue_width  = 0.12 // width around center; 0.08..0.16 typical
 //!PARAM float L_low = 0.45      // start compressing above this lightness (lighter browns)
- //!PARAM float L_high = 0.85     // full effect by this lightness
+//!PARAM float L_high = 0.85     // full effect by this lightness
 //!PARAM float mid_bias = 0.6    // emphasize mid-sat more than very low/high sat
 //!PARAM float gamma_in = 1.0
 //!PARAM float gamma_out = 1.0
