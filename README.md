@@ -65,7 +65,7 @@ Think: *a good DVD player feeding a high-end CRT — but in 4K.*
 
 1. Clone or copy this repository into your mpv configuration directory:  
    ```bash
-   git clone https://github.com/<yourname>/mpv-analog-restoration-chain ~/.config/mpv
+   git clone https://github.com/frkfl/mpv-upscale4k ~/.config/mpv
 
 2. Todo
 
