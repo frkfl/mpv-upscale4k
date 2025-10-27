@@ -125,6 +125,64 @@ Light reconstruction, stronger micro-contrast, and specular protection.
 
 ---
 
+## Compatibility
+
+# Hardware
+
+## Geforce 3080 RTX
+
+This is simply the GPU I am using.
+For HD content, it is extremely light, in memory, I get 10% use of the GPU. I tested the code once on a 1070 GTX, no problems.
+For old VHS-like video, it is much heavier. 20~30% range.
+But there is no AI, so no problem with a 2070 I would assume.
+
+## No heavy process
+
+So there is almost nothing heavy in the code. Nothing in the code I wrote.
+Most code are pixel per pixel work, parallelized in the GPU : Even 4K work is super fast.
+
+3 things are heavy:
+
+1 - FSRCNXX is heavy.
+
+It is the "AI upscaler". But there is nothing AI in it.
+A neural network (they are sometimes called AI) trained on a tons of videos and that gave a list of magic numbers.
+Like : 0.0075713125988841, use that here in your calculation. It's a very topic on itself.
+
+These numbers used in mathematical calculations (matrices) to give the best improvement.
+So the number are hard coded, there is no AI looking at your picture.
+But it is a multi pass, complex, heavy on math process.
+
+
+So it is hard to guarantee anything else than that it works on my PC lol
+I have a Geforce RTX 3080. 
+
+2 - Nlmeans is heavy
+
+It is a quality improver. How to make the picture cleaner without making it weird, with block, or blur.
+And I nead it for low resolution video. But I have a trick, I apply in intermediary resolution : 1080p
+
+3 - My own code.
+
+So far, nothing is really heavy, each shader is often 0.5ms.
+But I already have 20 shaders. That's why it's heavy. So many things to fix.
+
+Did you know that old sources have signal interference in the cable between color and light?
+Well, that's why the colors come out disgusting.
+It can be detected and partially fixed. But it's a few passes, you get more in the 1~3ms territory.
+And you have like 40 ms to generate a frame. And you would rather do it in 10 ms so that you don't need a Geforce 3080 running at 100%.
+
+
+# Vulkan 
+
+Setting vulkan is very simple. It is a GLSL engine for our shader.
+In lay terms, it is the language to work on the picture.
+
+What is a bit tricky is that the GLSL version is provided by the vulkan implementation in the GPU driver installation.
+So in 2 years it could break. Already, there is a big divide 330/450.
+But, fortunately, in practice, 330 or 450 should be higly compatible as we mostly code in very stable, and use only a handful of 2D primitives that are higly compatible.
+At home I work with 450. So I rely on you to tell me if something is off. You should really get deep issues if it does not work : black screen, horrible colors, white noise.
+
 ## 📜 License
 
 All shaders and configs are released under the MIT License.
