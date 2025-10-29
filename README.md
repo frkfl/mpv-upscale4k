@@ -172,6 +172,24 @@ Well, that's why the colors come out disgusting.
 It can be detected and partially fixed. But it's a few passes, you get more in the 1~3ms territory.
 And you have like 40 ms to generate a frame. And you would rather do it in 10 ms so that you don't need a Geforce 3080 running at 100%.
 
+# Processing
+
+## Analog-domain improvements
+
+This is the full analog defect spectrum that actually exists in VHS, DV, VCD, and early digital transfers.
+Only used for resolution around 480p. It is fairly neutral for non analog sources (a DVD VOB).
+But I don't really see the point of risking a 1080p picture with analog fixes.
+
+| Problem                             | Physical origin                   | Status                                         |
+| ----------------------------------- | --------------------------------- | --------------------------------------------------------------- |
+| Y/C subcarrier phase drift          | Analog bandwidth + delay mismatch | ✅ Corrected (directional realignment `shift_px`, `k_strength`)  |
+| One-way chroma bleed                | Filter asymmetry in tape playback | ✅ Modeled by sign(Gy * ΔC), directional and weighted            |
+| Cross-talk Y↔C energy               | Shared signal path interference   | ✅ Rebalanced via α/β feedback                                   |
+| Temporal flicker (luma gain wobble) | AGC instability, tape modulation  | ✅ Stabilized via deterministic EMA-like temporal smoothing      |
+| Shadow color cast / chroma noise    | Subcarrier amplitude loss         | ✅ Neutralized by tone gate + chroma attenuation below threshold |
+| Chroma loss near highlights         | Phase saturation in bright Y      | ✅ Compensated by soft knee + upper contrast rolloff             |
+| Texture erosion                     | Bleed and protection interplay    | ✅ Prevented via HF preservation path and `Protect` gating       |
+
 
 # Vulkan 
 
