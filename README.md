@@ -2,10 +2,10 @@
   <img src="https://en.wikipedia.org/wiki/Mpv_(media_player)#/media/File:Mpv_logo_(official).png" alt="mpv logo" width="90" height="90"/>
 </p>
 
-<h1 align="center">🎞️ Analog Restoration Chain for mpv</h1>
+<h1 align="center">🎞️ The best 4K possible for mpv, whatever the source</h1>
 
 <p align="center">
-  <em>Rebuilding lost analog beauty — not hallucinating digital sharpness.</em>
+  <em>Rebuilding lost analog beauty, lost digital crispness — not hallucinating digital sharpness.</em>
 </p>
 
 <p align="center">
@@ -19,12 +19,23 @@
 
 ### 🧭 Overview
 
-The **Analog Restoration Chain** is a collection of GLSL shaders and profiles for **mpv** that reconstruct perceptual video quality from **240p to 1080p sources** — turning noisy, compressed footage into a **stable, filmic 4K experience**.
+The **Best 4K for mpv, whatever the source** is a complete solution to drag & drop to upscale to 4K from any sources. No setting required. No tuning. Throw it your worst.
+
+It is a collection of GLSL shaders and profiles for **mpv** that reconstruct perceptual video quality from **240p to 1080p sources** — turning noisy, compressed footage into a **stable, filmic 4K experience** as much as possible, extracting the most information possible from each pixel. The configuration files take care of selecting the right process, cleaning process are auto-tuned.
 
 In addition to a classic Neural upscaler, this project:
 - Restores texture and tone without fabricating detail  
-- Uses entropy, color fidelity, and analog simulation  
+- Uses entropy, color fidelity, and analog simulation
+- Fix analog problems like chroma bleeding and many other
+- Provide a full chain of numerical restoration tuned for each resolution
 - Runs fully in real time on modern GPUs (tested on RTX 3080)
+
+The result will depends on the source material, but every source will get every hint of information squeeze to give the best details in 4K
+
+Expect
+- Surpringly watchable old camera records
+- Excellent rendering from 720p, with no blur a little artifact, but not that detailed
+- Almost 4K full quality from an average/mediocrer 1080p video
 
 ---
 
