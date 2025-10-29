@@ -19,7 +19,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-// Description: HQ/nlmeans_light.glsl: Slow, but higher quality. Tuned for light noise.
+// Description: HQ/nlmeans_light_temporal.glsl: Slow, but higher quality. Very experimental and buggy, limited to vo=gpu-next. Tuned for light noise.
 
 // The following is shader code injected from ./nlmeans_template
 /* vi: ft=c
@@ -1395,7 +1395,9 @@ vec4 hook()
 //!BIND HOOKED
 //!BIND G
 //!BIND GC
-//!DESC Non-local means (HQ/nlmeans_light.glsl)
+//!BIND PREV1
+//!BIND PREV2
+//!DESC Non-local means (HQ/nlmeans_light_temporal.glsl)
 
 
 
@@ -1659,7 +1661,7 @@ vec4 hook()
  * TD: temporal distortion, higher numbers give less weight to previous frames
  */
 #ifdef LUMA_raw
-#define T 0
+#define T 2
 #define ME 1
 #define MEF 2
 #define TRF 0
@@ -2196,7 +2198,8 @@ val GET(vec3 off)
 {
 	switch (min(int(off.z), frame)) {
 	case 0: return val_swizz(GET_(off));
-
+	case 1: return val_swizz(imageLoad(PREV1, ivec2((HOOKED_pos + HOOKED_pt * vec2(off)) * HOOKED_size)));
+	case 2: return val_swizz(imageLoad(PREV2, ivec2((HOOKED_pos + HOOKED_pt * vec2(off)) * HOOKED_size)));
 	}
 }
 val GET_GUIDE(vec3 off)
@@ -2653,7 +2656,7 @@ vec4 hook()
 
 	// store frames for temporal
 #if T > 1
-
+	imageStore(PREV2, ivec2(HOOKED_pos*HOOKED_size), unval_guide(GET_GUIDE(vec3(0,0,2-1))));
 #endif
 #if T && TRF
 	imageStore(PREV1, ivec2(HOOKED_pos*HOOKED_size), unval(result));
@@ -2721,3 +2724,12 @@ vec4 hook()
 	return unval(result);
 }
 
+//!TEXTURE PREV1
+//!SIZE 3840 3840
+//!FORMAT r16f
+//!STORAGE
+
+//!TEXTURE PREV2
+//!SIZE 3840 3840
+//!FORMAT r16f
+//!STORAGE

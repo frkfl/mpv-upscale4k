@@ -185,7 +185,7 @@ And you have like 40 ms to generate a frame. And you would rather do it in 10 ms
 
 # Processing
 
-## Analog-domain improvements
+## Analog-domain repairs
 
 This is the full analog defect spectrum that actually exists in VHS, DV, VCD, and early digital transfers.
 Only used for resolution around 480p. It is fairly neutral for non analog sources (a DVD VOB).
@@ -200,6 +200,18 @@ But I don't really see the point of risking a 1080p picture with analog fixes.
 | Shadow color cast / chroma noise    | Subcarrier amplitude loss         | ✅ Neutralized by tone gate + chroma attenuation below threshold |
 | Chroma loss near highlights         | Phase saturation in bright Y      | ✅ Compensated by soft knee + upper contrast rolloff             |
 | Texture erosion                     | Bleed and protection interplay    | ✅ Prevented via HF preservation path and `Protect` gating       |
+
+## Analog-domain improvements
+
+These are improvements that are less deterministic. More a by-product of analog support flaws than a mathematical fix.
+But it is deterministic enough to be activate if needed only, and universal for analog videos.
+
+| Stage                                | Physical origin                                                                 | Deterministic correction                                                                     |
+| ------------------------------------ | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| **1. Auto dering detector**          | Subcarrier ringing and high-frequency chroma echo from Y/C separation filters   | ✅ Detects oscillation in Cb/Cr across ±2 px → applies directional 1D Gaussian dering (≈20 %) |
+| **2. Auto chroma gain compensation** | AGC cross-coupling between luma and chroma amplifiers causing hue drift         | ✅ Measures chroma amplitude vs luma → applies proportional gain flattening via `gain_corr`   |
+| **3. Auto unclip detector**          | ADC headroom loss: crushed blacks and clipped whites from limited dynamic range | ✅ Detects local min/max bounds → restores detail with soft power-curve unclip (0.88 / 1.05)  |
+
 
 
 # Vulkan 
