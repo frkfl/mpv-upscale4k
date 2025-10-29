@@ -1,8 +1,3 @@
-//!DESC Normalization Front-End v2 (Deterministic / linear / pre-upscale)
-//!HOOK MAIN
-//!BIND HOOKED
-
-// ---- Parameters (strict format) ----
 //!PARAM th_low
 //!TYPE float
 0.035
@@ -51,6 +46,10 @@
 //!PARAM max_desat
 //!TYPE float
 0.30
+
+//!DESC Normalization Front-End v2 (Deterministic / linear / pre-upscale)
+//!HOOK MAIN
+//!BIND HOOKED
 
 // ---- Constants ----
 const float EPS  = 1e-6;
@@ -205,10 +204,17 @@ vec4 hook() {
     float Yt = mix(Yk, mix(Yk, Ylp, 0.25), a * 0.2);
 
     // Back to RGB (stay linear; gpu-next handles presentation)
-    vec3 ycc_out = vec3(clamp(Yt, 0.0, 1.0), clamp(Cb, 0.0, 1.0), clamp(Cr, 0.0, 1.0));
+    // keep tiny headroom, no double clamp
+    vec3 ycc_out = vec3(
+        clamp(Yt, -0.02, 1.02),
+        clamp(Cb, 0.0, 1.0),
+        clamp(Cr, 0.0, 1.0)
+    );
+
+    // back to RGB with slight float headroom
     vec3 rgb_out = ycbcr601_to_rgb(ycc_out);
-    rgb_out = clamp(rgb_out, -0.025, 1.025);
-    rgb_out = clamp(rgb_out * 0.98 + 0.01, 0.0, 1.0);
+    rgb_out = clamp(rgb_out, -0.05, 1.05);
 
     return vec4(rgb_out, HOOKED_tex(HOOKED_pos).a);
 }
+ 
