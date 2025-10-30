@@ -127,6 +127,8 @@ Light reconstruction, stronger micro-contrast, and specular protection.
 
 ## 🧪 Roadmap
 
+ - Fullest 480p Analog/early digital restoration
+ - Feeding information from analog for later digital shader (Neural!!)
  - Lua / Python auto-profile by quality scoring
  - Per-scene adaptive tone mapping
  - Real-time tweak OSC overlay
