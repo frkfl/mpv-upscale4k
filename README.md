@@ -212,7 +212,9 @@ But it is deterministic enough to be activate if needed only, and universal for 
 | **2. Auto chroma gain compensation** | AGC cross-coupling between luma and chroma amplifiers causing hue drift         | ✅ Measures chroma amplitude vs luma → applies proportional gain flattening via `gain_corr`   |
 | **3. Auto unclip detector**          | ADC headroom loss: crushed blacks and clipped whites from limited dynamic range | ✅ Detects local min/max bounds → restores detail with soft power-curve unclip (0.88 / 1.05)  |
 
+## Analog-DV-domain temporal stability
 
+Breaks the shimmering effect on poor quality VHS (home camera), and the "square effect" on Hi8/DV (the first digital camera) where the picturee is perceptually divided in blocks with visible borders.
 
 # Vulkan 
 
