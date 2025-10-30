@@ -27,7 +27,7 @@
 //!BIND HOOKED
 //!BIND PREV1
 //!BIND PREV2
-//!DESC 🎛️ Temporal Stabilizer — Deterministic (horizontal ringing suppression)
+//!DESC Temporal Stabilizer — Deterministic (horizontal ringing suppression)
 
 const float EPS = 1e-7;
 const vec3  W709 = vec3(0.2126, 0.7152, 0.0722); // BT.709 luma
