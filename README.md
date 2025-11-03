@@ -187,7 +187,11 @@ And you have like 40 ms to generate a frame. And you would rather do it in 10 ms
 
 # Processing
 
-## Analog-domain repairs
+## Analog Repair
+
+Brings the raw analog frame to “coherent but still low-frequency noisy.” It removes phase jitter, ringing, and line noise at native pixel geometry.
+
+### Analog-domain repairs
 
 This is the full analog defect spectrum that actually exists in VHS, DV, VCD, and early digital transfers.
 Only used for resolution around 480p. It is fairly neutral for non analog sources (a DVD VOB).
@@ -203,7 +207,7 @@ But I don't really see the point of risking a 1080p picture with analog fixes.
 | Chroma loss near highlights         | Phase saturation in bright Y      | ✅ Compensated by soft knee + upper contrast rolloff             |
 | Texture erosion                     | Bleed and protection interplay    | ✅ Prevented via HF preservation path and `Protect` gating       |
 
-## Analog-domain improvements
+### Analog-domain improvements
 
 These are improvements that are less deterministic. More a by-product of analog support flaws than a mathematical fix.
 But it is deterministic enough to be activate if needed only, and universal for analog videos.
@@ -214,9 +218,19 @@ But it is deterministic enough to be activate if needed only, and universal for 
 | **2. Auto chroma gain compensation** | AGC cross-coupling between luma and chroma amplifiers causing hue drift         | ✅ Measures chroma amplitude vs luma → applies proportional gain flattening via `gain_corr`   |
 | **3. Auto unclip detector**          | ADC headroom loss: crushed blacks and clipped whites from limited dynamic range | ✅ Detects local min/max bounds → restores detail with soft power-curve unclip (0.88 / 1.05)  |
 
-## Analog-DV-domain temporal stability
+## Analog/Digital Structure Repair
 
-Breaks the shimmering effect on poor quality VHS (home camera), and the "square effect" on Hi8/DV (the first digital camera) where the picturee is perceptually divided in blocks with visible borders.
+Reconstructs local contrast and geometry after the front-end is stable. Still spatially tied to 480 p sampling.
+
+### Temporal Structural Stabilizer
+
+| Stage                                | Physical origin                                                                 | Deterministic correction                                                                     |
+| ------------------------------------ | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| **1. Upscale**                       | The analog fix did its best. We need more pixel to temporize                    | ✅ Spline upscale                                                                            |
+| **2. Temporal Structural Stabilizer**| Frame individually look better. In motion, the picture is unstable.             | ✅ unifies frame-to-frame micro-variance in that sub-pixel domain                            |
+
+
+
 
 # Vulkan 
 
