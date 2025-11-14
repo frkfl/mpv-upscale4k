@@ -31,60 +31,77 @@
 
 //!HOOK MAIN
 //!BIND HOOKED
-//!DESC Adaptive log color expansion (BT.2020 limited→full)
+//!DESC Adaptive log color expansion (highlight-safe, no white crush)
 
-// Constants
-const float EPS = 1e-5;                         // small epsilon
-const vec3  W2020 = vec3(0.2627,0.6780,0.0593); // BT.2020 luma
+const float EPS = 1e-5;
+const vec3  W2020 = vec3(0.2627,0.6780,0.0593);
 
-// Log mapping normalized to 0..1
-float map_log01(float v, float k) {             // v∈[0,1], k>0
-    return log(1.0 + k * clamp(v,0.0,1.0)) / log(1.0 + k);
+// Log mapping
+float map_log01(float v, float k) {
+    v = clamp(v,0.0,1.0);
+    return log(1.0 + k * v) / log(1.0 + k);
 }
 
 // Soft knee highlight roll-off
 vec3 soft_clip(vec3 v, float knee) {
-    if (knee <= 0.0) return clamp(v,0.0,1.0);   // no knee
-    vec3 base = clamp(v,0.0,1.0 + knee);       // allow headroom
-    vec3 over = max(base - 1.0, 0.0);          // amount over 1
-    vec3 rolled = over / (1.0 + over / knee);  // reciprocal knee
+    if (knee <= 0.0) return clamp(v,0.0,1.0);
+    vec3 base = clamp(v,0.0,1.0 + knee);
+    vec3 over = max(base - 1.0, 0.0);
+    vec3 rolled = over / (1.0 + over / knee);
     return clamp(base - over + rolled, 0.0, 1.0);
 }
 
 vec4 hook() {
-    vec2 uv = HOOKED_pos;                      // pixel coord
-    vec4 src = HOOKED_tex(uv);                 // source texel
-    vec3 rgb = src.rgb;                        // source rgb
+    vec3 rgb = HOOKED_tex(HOOKED_pos).rgb;
 
-    // Normalize limited-range to 0..1
+    // Normalize limited range
     float range = max(white_level - black_level, EPS);
     vec3 norm = clamp((rgb - black_level) / range, 0.0, 1.0);
 
-    // Luminance in log domain
-    float luma = dot(norm, W2020);             // 2020 luma
+    // Luma and log-luma
+    float luma = dot(norm, W2020);
     float log_luma = map_log01(luma, max(log_strength, EPS));
 
-    // Luminance-dependent exponent
+    // Luminance-driven exponent
     float expo_lin = mix(adapt_floor, adapt_ceiling, log_luma);
-    float expo = mix(1.0, expo_lin, clamp(exponent_weight, 0.0, 1.0));
+    float expo = mix(1.0, expo_lin, clamp(exponent_weight,0.0,1.0));
 
-    // Shape with exponent
+    // Exponent shaping
     vec3 shaped = pow(max(norm, vec3(EPS)), vec3(expo));
 
-    // Adaptive gain around pivot in log space
-    float pivot_log = map_log01(clamp(adapt_pivot,0.0,1.0), max(log_strength, EPS));
+    // Adaptive gain around pivot
+    float pivot_log = map_log01(clamp(adapt_pivot,0.0,1.0), max(log_strength,EPS));
     float gain = exp2((log_luma - pivot_log) * adapt_contrast);
 
-    // Match target luminance
+    //--------------------------------------------------------------
+    // *** FIX 1: prevent runaway gain from blowing out everything ***
+    // Limit gain so that shaped_luma * gain stays inside soft-knee
+    //--------------------------------------------------------------
+    gain = min(gain, 1.0 + soft_knee * 3.0);
+
+    // Luminance target WITHOUT clipping (soft knee later)
     float shaped_luma = max(dot(shaped, W2020), EPS);
-    float target_luma = clamp(shaped_luma * gain, 0.0, 1.0);
+    float target_luma = shaped_luma * gain;
+
+    //--------------------------------------------------------------
+    // *** FIX 2: apply soft knee BEFORE scaling RGB ***
+    //--------------------------------------------------------------
+    target_luma = soft_clip(vec3(target_luma), max(soft_knee,0.0)).r;
+
+    // Scale RGB by safe luminance ratio
     float lum_scale = target_luma / shaped_luma;
     vec3 adapted = shaped * lum_scale;
 
-    // Blend some original chroma
-    adapted = mix(adapted, norm, clamp(chroma_preserve, 0.0, 1.0));
+    //--------------------------------------------------------------
+    // *** FIX 3: prevent per-channel blowout before soft-knee ***
+    //--------------------------------------------------------------
+    adapted = min(adapted, vec3(1.0 + soft_knee));
 
-    // Apply soft knee and output
-    vec3 out_rgb = soft_clip(adapted, max(soft_knee, 0.0));
-    return vec4(out_rgb, src.a);               // full-range out
+    // Chromaticity preservation
+    adapted = mix(adapted, norm, clamp(chroma_preserve,0.0,1.0));
+
+    // Final soft knee
+    vec3 out_rgb = soft_clip(adapted, max(soft_knee,0.0));
+
+    return vec4(out_rgb, 1.0);
 }
