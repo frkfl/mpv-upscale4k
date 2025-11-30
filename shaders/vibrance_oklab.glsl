@@ -18,27 +18,28 @@
 //!TYPE float
 0.20
 
-//!PARAM gamma_in
-//!TYPE float
-2.20
-
-//!PARAM gamma_out
-//!TYPE float
-2.20
-
 //!HOOK POSTKERNEL
 //!BIND HOOKED
-//!DESC Vibrance (OkLab, luma-preserving, skin-protect)
+//!DESC HDR-safe OkLab vibrance (auto-linear-detect)
 
-// sRGB <-> linear helpers
-vec3 toLin(vec3 c, float g) {
-    return pow(max(c, 0.0), vec3(g > 0.0 ? 1.0 / g : 1.0));
-}
-vec3 toGam(vec3 c, float g) {
-    return pow(max(c, 0.0), vec3(g > 0.0 ? g : 1.0));
+const float EPS = 1e-6;
+
+// --- gamma helpers (but auto-detect if input is already linear) ---
+vec3 try_to_linear(vec3 c) {
+    // If any channel > 1.2 → definitely linear HDR float
+    float m = max(max(c.r, c.g), c.b);
+    if (m > 1.2) return c;
+
+    // Heuristic: SDR but gamma-encoded
+    return pow(max(c, vec3(0.0)), vec3(2.2));
 }
 
-// sRGB linear -> OkLab (Björn Ottosson)
+vec3 to_gamma(vec3 c) {
+    // allow negative and >1 → clamp at end only
+    return pow(max(c, vec3(0.0)), vec3(1.0 / 2.2));
+}
+
+// --- OkLab transforms (linear RGB only) ---
 mat3 M1 = mat3(
     0.4122214708, 0.5363325363, 0.0514459929,
     0.2119034982, 0.6806995451, 0.1073969566,
@@ -51,73 +52,77 @@ mat3 M2 = mat3(
 );
 
 vec3 linear_srgb_to_oklab(vec3 c) {
-    vec3 lms = pow(M1 * c, vec3(1.0 / 3.0));
+    // keep LMS non-negative for cube root
+    vec3 lms = M1 * c;
+    lms = pow(max(lms, vec3(EPS)), vec3(1.0/3.0));
     return M2 * lms;
 }
 
 vec3 oklab_to_linear_srgb(vec3 LLab) {
     float L = LLab.x, a = LLab.y, b = LLab.z;
-    float l = (L + 0.3963377774 * a + 0.2158037573 * b);
-    float m = (L - 0.1055613458 * a - 0.0638541728 * b);
-    float s = (L - 0.0894841775 * a - 1.2914855480 * b);
-    l = l * l * l; m = m * m * m; s = s * s * s;
+    float l = L + 0.3963377774 * a + 0.2158037573 * b;
+    float m = L - 0.1055613458 * a - 0.0638541728 * b;
+    float s = L - 0.0894841775 * a - 1.2914855480 * b;
+
+    l = l*l*l; m = m*m*m; s = s*s*s;
+
     mat3 Mi = mat3(
         4.0767416621, -3.3077115913,  0.2309699292,
        -1.2684380046,  2.6097574011, -0.3413193965,
         0.0041960863, -0.7034186147,  1.6996226760
     );
-    return Mi * vec3(l, m, s);
+
+    return Mi * vec3(l,m,s);
 }
 
-// Compute hue in linear space for gating skin
-float safe_hue(vec3 rgb_lin) {
-    float M = max(max(rgb_lin.r, rgb_lin.g), rgb_lin.b);
-    float m = min(min(rgb_lin.r, rgb_lin.g), rgb_lin.b);
-    float C = max(M - m, 1e-6);
-    vec3 n = (rgb_lin - m) / C;
-    float h = (M == rgb_lin.r) ? (n.g - n.b)
-            : (M == rgb_lin.g) ? (2.0 + n.b - n.r)
-                               : (4.0 + n.r - n.g);
-    h = fract((h / 6.0) + 1.0);
-    return h;
+// Skin hue detector (robust)
+float safe_hue(vec3 c) {
+    float M = max(max(c.r, c.g), c.b);
+    float m = min(min(c.r, c.g), c.b);
+    float C = max(M - m, EPS);
+    vec3 n = (c - m) / C;
+    float h = (M == c.r) ? (n.g - n.b)
+            : (M == c.g) ? (2.0 + n.b - n.r)
+                         : (4.0 + n.r - n.g);
+    return fract(h / 6.0);
 }
 
 vec4 hook() {
-    vec2 uv = HOOKED_pos;
-    vec3 srgb = HOOKED_tex(uv).rgb;
-    vec3 lin  = toLin(srgb, gamma_in);
+    vec3 srgb = HOOKED_tex(HOOKED_pos).rgb;
 
-    // Convert to OkLab
-    vec3 lab = linear_srgb_to_oklab(lin);
-    float L = lab.x;
-    float a = lab.y;
-    float b = lab.z;
+    // Convert to linear, even for HDR
+    vec3 lin = try_to_linear(srgb);
 
-    // Chroma and saturation
-    float C = length(vec2(a, b));
-    float sat = C / max(L, 1e-4);
+    // Prevent LMS from going negative
+    vec3 lin_clamped = max(lin, vec3(EPS));
 
-    // Mid-saturation emphasis
+    // OkLab
+    vec3 lab = linear_srgb_to_oklab(lin_clamped);
+    float L = lab.x, a = lab.y, b = lab.z;
+
+    float C = length(vec2(a,b));
+    float sat = C / max(L, EPS);
+
+    // mid-sat boost
     float mid = smoothstep(0.0, 1.0, sat / (sat + 0.5));
     mid = mix(1.0, mid, mid_bias);
 
-    // Skin hue protection
-    float h = safe_hue(lin);
-    float dh = abs(h - skin_hue);
-    dh = min(dh, 1.0 - dh);
-    float skin_gate = 1.0 - skin_protect *
-        exp(-0.5 * pow(dh / max(skin_width, 1e-3), 2.0));
+    // skin protection
+    float h  = safe_hue(lin_clamped);
+    float dh = min(abs(h - skin_hue), 1.0 - abs(h - skin_hue));
+    float skin_gate = 1.0 - skin_protect * exp(-0.5 * pow(dh / skin_width, 2.0));
 
-    // Vibrance factor
+    // vibrance
     float k = vibrance * mid * skin_gate;
 
-    // Apply vibrance (radial chroma expansion)
-    float scale = 1.0 + k;
-    vec3 lab2 = vec3(L, a * scale, b * scale);
+    vec3 lab2 = vec3(L, a * (1.0 + k), b * (1.0 + k));
 
     // Convert back
-    vec3 out_lin  = oklab_to_linear_srgb(lab2);
-    vec3 out_srgb = toGam(out_lin, gamma_out);
+    vec3 out_lin = oklab_to_linear_srgb(lab2);
 
-    return vec4(clamp(out_srgb, 0.0, 1.0), 1.0);
+    // Collapse HDR/wide to SDR gamma
+    vec3 out_sdr = to_gamma(out_lin);
+
+    // Final clamp
+    return vec4(clamp(out_sdr, 0.0, 1.0), 1.0);
 }
