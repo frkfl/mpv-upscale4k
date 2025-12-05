@@ -7,6 +7,13 @@
 # OUTPUT = encoded 4K HEVC file
 #          default: "<input basename>_restored.mkv" in the same directory
 # MPV_PROFILE_CONF (optional) = mpv profile file containing glsl-shaders-append lines
+#
+# Requirement
+# - Linux
+# - Nvidia GPU
+# - ffmpeg and mpv installed
+#
+# But you can change the script to CPU encoding, run it on WSL, and enjoy a 3 hours break
 
 set -u
 
