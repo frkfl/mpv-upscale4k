@@ -52,23 +52,6 @@ Think: *a good DVD player feeding a high-end CRT — but in 4K.*
 
 ---
 
-## 🧩 Design Philosophy
-> “Don’t reinvent pixels — let them remember how they used to look.”
-
-## Core principles
-1. **No recreation, only reconstruction**  
-   Filters derive structure from artifact patterns, not neural guesswork.
-2. **Entropy before collapse**  
-   Controlled grain and CRT emulation break compression regularities.
-3. **Layered linearity**  
-   All passes operate in float-linear (RGBA16F) space to avoid posterization.
-4. **Perceptual correction, not perfection**  
-   A slightly soft, coherent image is preferable to brittle digital sharpness.
-5. **Temporal calm**  
-   A single stabilizer (TXAA-lite, temporal blend, or sharpen-decay) maintains visual stability.
-
----
-
 ## ⚙️ Installation
 
 ### Prerequisites
@@ -110,10 +93,6 @@ git clone https://github.com/frkfl/mpv-upscale4k ~/.config/mpv
 ```
 
 ---
-
-Got it, let’s make it feel like a real README section, not a Q&A block.
-
-Here’s a cleaner, narrative-style version you can drop in:
 
 ## ▶️ How to use
 
@@ -288,6 +267,22 @@ And you have like 40 ms to generate a frame. And you would rather do it in 10 ms
 ## Analog Repair
 
 Brings the raw analog frame to “coherent but still low-frequency noisy.” It removes phase jitter, ringing, and line noise at native pixel geometry.
+
+### 🧩 Design Philosophy
+> “Don’t reinvent pixels — let them remember how they used to look.”
+
+## Core principles
+1. **No recreation, only reconstruction**  
+   Filters derive structure from artifact patterns, not neural guesswork.
+2. **Entropy before collapse**  
+   Controlled grain and CRT emulation break compression regularities.
+3. **Layered linearity**  
+   All passes operate in float-linear (RGBA16F) space to avoid posterization.
+4. **Perceptual correction, not perfection**  
+   A slightly soft, coherent image is preferable to brittle digital sharpness.
+5. **Temporal calm**  
+   A single stabilizer (TXAA-lite, temporal blend, or sharpen-decay) maintains visual stability.
+
 
 ### Analog-domain repairs
 
