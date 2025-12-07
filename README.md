@@ -161,7 +161,7 @@ fix ugly artifacts, rebuild structure, give the grade the scan it deserved – a
 | ---------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | 480p – TV Record          | <img src="samples/before_480p.jpg" alt="480p before – A TV Show" width="420" />    | <img src="samples/after_480p.jpg" alt="480p after – A TV Show" width="420" />         |
 | 720p – dark barn interior          | <img src="samples/before_720p.jpg" alt="720p before – barn interior" width="420" />    | <img src="samples/after_720p.jpg" alt="720p after – barn interior" width="420" />         |
-| 1080p – daylight porch, skin tones | <img src="samples/before_1080p.jpg" alt="1080p before – porch" width="420" />          | <img src="samples/after_1080p.jpg" alt="1080p after – porch" width="420" />               |
+| 1080p – daylight porch, skin tones | <img src="samples/before_1080p1.jpg" alt="1080p before – porch" width="420" />          | <img src="samples/after_1080p1.jpg" alt="1080p after – porch" width="420" />               |
 
 
 ---
