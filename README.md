@@ -39,19 +39,6 @@ Expect
 
 ---
 
-# 🎞️ Analog Restoration Chain for mpv
-### *Rebuilding lost image quality through patient, layered refinement.*
-
----
-
-## 📜 Overview
-This project provides a collection of GLSL shaders and mpv profiles designed to **restore perceptual quality** to low-resolution, heavily compressed video (480p or less) — without hallucinating fake detail.  
-It works by **deconstructing compression artifacts**, **restoring analog structure**, and **re-stitching tone, color, and texture** into a stable, film-like result.
-
-Think: *a good DVD player feeding a high-end CRT — but in 4K.*
-
----
-
 ## ⚙️ Installation
 
 ### Prerequisites
@@ -266,7 +253,11 @@ And you have like 40 ms to generate a frame. And you would rather do it in 10 ms
 
 ## Analog Repair
 
+This is a specific layer for sub-HD resolutions. Working in the VHS trenches.
+
 Brings the raw analog frame to “coherent but still low-frequency noisy.” It removes phase jitter, ringing, and line noise at native pixel geometry.
+*Rebuilding lost image quality through patient, layered refinement.*
+Think: *a good DVD player feeding a high-end CRT — but in 4K.*
 
 ### 🧩 Design Philosophy
 > “Don’t reinvent pixels — let them remember how they used to look.”
