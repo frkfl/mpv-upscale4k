@@ -75,6 +75,11 @@ Think: *a good DVD player feeding a high-end CRT — but in 4K.*
 
 Install **mpv**: https://mpv.io/installation/
 
+## Download the project
+
+Go to the release page, download Assets → Source Code (zip)
+https://github.com/frkfl/mpv-upscale4k/releases
+
 ## Add / Install this project
 
 Clone **or** copy this project into your mpv configuration directory.
