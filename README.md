@@ -55,7 +55,7 @@ Think: *a good DVD player feeding a high-end CRT — but in 4K.*
 ## 🧩 Design Philosophy
 > “Don’t reinvent pixels — let them remember how they used to look.”
 
-### Core principles
+## Core principles
 1. **No recreation, only reconstruction**  
    Filters derive structure from artifact patterns, not neural guesswork.
 2. **Entropy before collapse**  
@@ -69,16 +69,89 @@ Think: *a good DVD player feeding a high-end CRT — but in 4K.*
 
 ---
 
+# ⚙️ Installation
+
+## Prerequisites
+
+Install **mpv**: https://mpv.io/installation/
+
+## Add / Install this project
+
+Clone **or** copy this project into your mpv configuration directory.
+
+| OS           | Installation                                                                                         |
+| :----------- | :--------------------------------------------------------------------------------------------------- |
+| **Windows**  | Copy all the project files into `%APPDATA%\mpv\` (usually `C:\Users\<YourName>\AppData\Roaming\mpv\`) |
+| **macOS**    | Copy all the project files into `~/.config/mpv`                                                      |
+| **Linux**    | Copy all the project files into `~/.config/mpv`                                                      |
+
+> **Important:**  
+> Copy the **contents** of the project into the mpv folder, not the folder itself.  
+> The final layout should look like:
+>
+> - `mpv/mpv.conf`
+> - `mpv/shaders/...`
+> - `mpv/shaders-dl/...`
+> - `mpv/profiles/...`
+>
+> **Not**: `mpv/mpv-upscale4k/mpv.conf`
+
+## Add / Install this project (power users)
+
+On Linux (and other Unix-like systems), you can clone directly into your mpv config dir:
+
+```bash
+git clone https://github.com/frkfl/mpv-upscale4k ~/.config/mpv 
+```
 
 ---
 
-## ⚙️ Installation WIP
+Got it, let’s make it feel like a real README section, not a Q&A block.
 
-1. Clone or copy this repository into your mpv configuration directory:  
-   ```bash
-   git clone https://github.com/frkfl/mpv-upscale4k ~/.config/mpv
+Here’s a cleaner, narrative-style version you can drop in:
 
-2. Todo
+## ▶️ How to use
+
+Once the files are in your mpv config folder, you just play videos with mpv as usual.  
+The restoration / upscaling runs automatically.
+
+### Opening a video
+
+**Windows**
+
+- Open **Explorer** and locate your video file.
+- Right-click the file → **Open with** → **mpv**  
+  (or drag the file onto `mpv.exe` / an mpv shortcut).
+
+**macOS**
+
+- Drag the video file onto the **mpv** app (in Dock or Applications), or
+- Use Terminal:
+  ```bash
+  mpv /path/to/your_video.mp4
+  ```
+
+**Linux**
+
+Well, you already know, don't you? mpv as a player and let's roll.
+Have fun with ~/.config/mpv if you want.
+
+
+### Toggling the processing
+
+The video processing is enabled by default.
+While a video is playing, you can enable/disable the processing:
+
+* Press **`Ctrl + S`** to **turn processing off** and see plain mpv scaling.
+* Press **`Ctrl + S`** again to **turn processing back on**.
+
+This lets you instantly compare:
+
+* the original player output, and
+* what this project reconstructs in motion.
+
+
+---
 
 ## 🧠 Pipeline Overview
 
@@ -96,18 +169,14 @@ Think: *a good DVD player feeding a high-end CRT — but in 4K.*
 
 ## 🔬 Profiles
 
-240p.conf
-
-For 240p–360p analog or VHS-era material.
-Performs double upscale, heavy artifact smoothing, and pre-collapse CRT.
-
 480.conf
+Patient VHS era deterministic noise reduction.
+Digital hammering with filters until it looks correct.
 
 720p
 Balanced reconstruction, medium entropy, adaptive sharpening, and color pop.
 
 1080.conf
-
 Web 900p and higher sources needing clarity without oversharpening.
 Light reconstruction, stronger micro-contrast, and specular protection.
 
@@ -229,8 +298,75 @@ Reconstructs local contrast and geometry after the front-end is stable. Still sp
 | **1. Upscale**                       | The analog fix did its best. We need more pixel to temporize                    | ✅ Spline upscale                                                                            |
 | **2. Temporal Structural Stabilizer**| Frame individually look better. In motion, the picture is unstable.             | ✅ unifies frame-to-frame micro-variance in that sub-pixel domain                            |
 
+## Colors
 
+That is a big differentiator with current solutions.
+Videos have a real problems with colors. It is not just about "put some AI and sharpening".
 
+### Better colors
+
+The picture is originally limited range. Broken by compression. Wrongly written in the metadata.
+
+| Stage                                | Goal                                                                            |
+| ------------------------------------ | ------------------------------------------------------------------------------- |
+| **1. Aut Color Matrix**             | Correct colors when the metadata is wrong, normalize.                           |
+| **2. Color Expang log**             | Push the limited range to full, more color to play with, real black&white       |
+| **3. OK LabCH Vibrance**            | A very documented method to give some natural vibrance on colors                |
+| **4. Chroma Pop**                   | It is like above, but more deterministic. Easier to adjust a popping color      |
+| **5. Shadow Lift**                  | Reduce the impact of shadows on lum for details                                 |
+
+### Totally, let’s make a clean, paste-ready version you can drop straight into your README.
+
+Here’s a compact version that keeps the intent, the tech bits, and the good-faith disclaimer.
+
+---
+
+### 🎭 Face fidelity & skin tones
+
+Human vision is brutally sensitive to faces.
+If skin tones are wrong, hair shimmers, or noses and mouths have halos, the whole image feels **uncanny**—even if everything else looks “sharper.”
+
+This project treats faces as **sacred**:
+
+* no plastic / wax skin
+* no fake HDR “Instagram face”
+* no dark skin vanishing into shadows
+* no pale skin turning into glowing paper next to a white wall
+
+A single generic “skin curve” doesn’t work in practice:
+
+* light skin tends to blend into bright backgrounds
+* darker skin gets crushed into black in low-key scenes
+* everyone drifts toward the same safe orange/peach midtone
+
+To avoid that, there’s a dedicated `skin_universal.glsl` shader, run with **multiple presets** for broad tone clusters (very fair, light-warm, olive, tan, brown, deep brown, etc.). The goal is not to stylize people, but the opposite:
+
+> give each skin tone enough headroom, contrast, and subtlety
+> that faces look like *themselves* again, under whatever broken light and compression survived.
+
+If a shot ends up with:
+
+* believable skin,
+* stable hair,
+* no shimmering around nose and mouth,
+
+then I accept losing some fake “wow” sharpness elsewhere.
+Real faces > perfect pixels.
+
+### ⚠️ Good faith & limitations
+
+This is written by one person, with one pair of eyes and a limited test set.
+
+I’ve put real work into making different skin tones look **true** under the same pipeline, not flattened into one “generic” look. That includes separate tuning for several tone clusters so:
+
+* light skin doesn’t vanish into walls,
+* darker skin doesn’t disappear in shadows,
+* everyone keeps their own undertones and reflectance.
+
+That said, it’s not perfect and it’s not universal. Cameras, lighting, makeup, grading, and compression can all interact in weird ways.
+7 skin tones is about 7 times more than any other attempt. It is a gigantic work. But 7... let's be real, we are 7 billions
+
+If you notice your own skin tone—or someone you care about—looking wrong under this pipeline, please treat that as a **bug**, not “how it is.” If you can, open an issue with a frame or a small clip. The intent is **respectful reconstruction**, and I’m very open to adjusting the math when it fails real people.
 
 # Vulkan 
 
