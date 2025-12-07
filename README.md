@@ -117,25 +117,11 @@ The restoration / upscaling runs automatically.
 
 ### Opening a video
 
-**Windows**
-
-- Open **Explorer** and locate your video file.
-- Right-click the file → **Open with** → **mpv**  
-  (or drag the file onto `mpv.exe` / an mpv shortcut).
-
-**macOS**
-
-- Drag the video file onto the **mpv** app (in Dock or Applications), or
-- Use Terminal:
-  ```bash
-  mpv /path/to/your_video.mp4
-  ```
-
-**Linux**
-
-Well, you already know, don't you? mpv as a player and let's roll.
-Have fun with ~/.config/mpv if you want.
-
+| OS        | How to open a video with mpv                                                                            |
+| :-------- | :------------------------------------------------------------------------------------------------------ |
+| **Windows** | Open **Explorer** → find your video → right-click → **Open with → mpv** (or drag the file onto `mpv.exe` / an mpv shortcut). |
+| **macOS**   | Drag the video file onto the **mpv** app (Dock / Applications), or run `mpv /path/to/file.mp4` in Terminal. |
+| **Linux**   | From a terminal: `mpv your_video_file.mkv`, or in your file manager: right-click → **Open With → mpv**. |
 
 ### Toggling the processing
 
