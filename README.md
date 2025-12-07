@@ -69,18 +69,18 @@ Think: *a good DVD player feeding a high-end CRT — but in 4K.*
 
 ---
 
-# ⚙️ Installation
+## ⚙️ Installation
 
-## Prerequisites
+### Prerequisites
 
 Install **mpv**: https://mpv.io/installation/
 
-## Download the project
+### Download the project
 
 Go to the release page, download Assets → Source Code (zip)
 https://github.com/frkfl/mpv-upscale4k/releases
 
-## Add / Install this project
+### Add / Install this project
 
 Clone **or** copy this project into your mpv configuration directory.
 
@@ -101,7 +101,7 @@ Clone **or** copy this project into your mpv configuration directory.
 >
 > **Not**: `mpv/mpv-upscale4k/mpv.conf`
 
-## Add / Install this project (power users)
+### Add / Install this project (power users)
 
 On Linux (and other Unix-like systems), you can clone directly into your mpv config dir:
 
@@ -141,6 +141,44 @@ This lets you instantly compare:
 * the original player output, and
 * what this project reconstructs in motion.
 
+
+# Sample screenshots
+
+This folder shows **before/after** frames so you can see what the pipeline is doing
+without reading graphs, LUT talk or shader code.
+
+The goal is **not** HDR wow-factor at all costs.  
+The goal is to respect the original **lighting, intent, shadows, skin tones and mood**:
+fix ugly artifacts, rebuild structure, give the grade the scan it deserved – and stop there.
+
+---
+
+## Gallery
+
+## Gallery
+
+| Resolution / scene                 | Before (source)                                                                 | After (mpv-upscale4k)                                                              |
+| ---------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| 480p – TV Record          | <img src="samples/before_480p.jpg" alt="480p before – A TV Show" width="420" />    | <img src="samples/after_480p.jpg" alt="480p after – A TV Show" width="420" />         |
+| 720p – dark barn interior          | <img src="samples/before_720p.jpg" alt="720p before – barn interior" width="420" />    | <img src="samples/after_720p.jpg" alt="720p after – barn interior" width="420" />         |
+| 1080p – daylight porch, skin tones | <img src="samples/before_1080p.jpg" alt="1080p before – porch" width="420" />          | <img src="samples/after_1080p.jpg" alt="1080p after – porch" width="420" />               |
+
+
+---
+
+### What to look for
+
+- **720p – barn interior**
+  - Left side: shadows stay dark but stop being a featureless blob.
+  - Wood texture and structure are clearer without HDR-style halos.
+  - The shirt and face stay in the same light – no fake “white shirt spotlight”.
+
+- **1080p – porch**
+  - Skin tones move away from yellow/green cast to something human.
+  - Whites through the windows look like daylight, not nicotine.
+  - Detail in beard and shirt is kept; no plastic smoothing, no crunchy sharpening.
+
+All samples are straight mpv playback with this project’s config. No extra grading in an editor.
 
 ---
 
