@@ -20,16 +20,25 @@ vec4 hook() {
     // Compute luma
     float Y = dot(col, vec3(0.2126, 0.7152, 0.0722));
 
-    // Smooth transition window around pivot
+    // Smooth transition window around pivot (where effect fades to 0)
+    // Avoid to crush details in lighted places
     float w = smoothstep(pivot - pivot / softness,
                          pivot + pivot / softness,
                          Y);
 
-    // **Black floor protection** — don't lift near absolute black
+    // Black floor protection — don't lift near absolute black
     float floorProtect = smoothstep(0.0, pivot * 0.5, Y);
 
+    // Extra weighting: only strong in deep shadows, fades out near pivot
+    float shadowFactor = clamp((pivot - Y) / pivot, 0.0, 1.0);
+    shadowFactor = pow(shadowFactor, softness); // steeper falloff toward pivot
+
     // Final lifted luma
-    float Y_lifted = mix(Y, Y + lift * (1.0 - w), floorProtect);
+    float Y_lifted = mix(
+        Y,
+        Y + lift * (1.0 - w) * shadowFactor,
+        floorProtect
+    );
 
     // Reconstruct chroma-preserving RGB
     float scale = (Y > 1e-6) ? (Y_lifted / Y) : 1.0;
