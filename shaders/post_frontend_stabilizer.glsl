@@ -67,7 +67,7 @@
 
 //!HOOK MAIN
 //!BIND HOOKED
-//!DESC Post Front-End Stabilizer v1 — optimized (branchless, 3-tap FIR, fused windows)
+//!DESC [Custom] Post Front-End Stabilizer (branchless, 3-tap FIR, fused windows)
 
 #define EPS 1e-6
 #define PI  3.14159265358979323846

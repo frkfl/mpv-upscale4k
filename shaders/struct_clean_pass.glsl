@@ -3,9 +3,9 @@
 //!TYPE float
 1.00
 
-//!HOOK POSTKERNEL
+//!HOOK MAIN
 //!BIND HOOKED
-//!DESC Structural Cleaning Reinforcement Pass (v1.2-Extended Deterministic Edition, w-floor fix)
+//!DESC [Custom] Structural Cleaning Reinforcement Pass
 
 #define RADIUS 4
 #define SOBEL_LOW 0.01

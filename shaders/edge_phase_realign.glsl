@@ -33,7 +33,7 @@
 //!HOOK POSTKERNEL
 //!BIND HOOKED
 //!BIND PREV
-//!DESC Edge Stabilization & Phase Re-Alignment Pass (deterministic)
+//!DESC [Custom] Edge Stabilization & Phase Re-Alignment Pass
 
 #define DEBUG_NONE        0
 #define DEBUG_EDGEMASK    1

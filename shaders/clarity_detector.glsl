@@ -19,9 +19,9 @@
 //!TYPE float
 0.25
 
-//!HOOK POSTKERNEL
+//!HOOK MAIN
 //!BIND HOOKED
-//!DESC Structure Clarity Detector (Y-preblur, curvature, chroma-luma coherence)
+//!DESC [Custom] Structure Clarity Detector (Y-preblur, curvature, chroma-luma coherence)
 
 #define EPS 1e-6
 

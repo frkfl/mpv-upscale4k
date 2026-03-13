@@ -24,9 +24,9 @@
 //!TYPE float
 0.55
 
-//!HOOK POSTKERNEL
+//!HOOK MAIN
 //!BIND HOOKED
-//!DESC Skin Detail Enhancer (skin-gated luma microtexture, grain-free output)
+//!DESC [Custom] Skin Detail Enhancer
 
 // BT.2020 luma (linear RGB)
 float luma2020(vec3 c) {

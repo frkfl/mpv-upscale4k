@@ -1,7 +1,6 @@
-
-//!DESC [noise_static_chroma]
 //!HOOK CHROMA
 //!BIND HOOKED
+//!DESC [noise_static_chroma]
 
 // Change this to tune the strength of the noise
 // Apparently this has to be float on some setups

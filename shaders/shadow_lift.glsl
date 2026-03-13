@@ -28,7 +28,7 @@
 
 //!HOOK MAIN
 //!BIND HOOKED
-//!DESC BT.2020 neighbor-aware shadow lift (or green if changed)
+//!DESC [Custom] BT.2020 neighbor-aware shadow lift (or green if changed)
 
 const float EPS   = 1e-6;
 const vec3  W2020 = vec3(0.2627, 0.6780, 0.0593);

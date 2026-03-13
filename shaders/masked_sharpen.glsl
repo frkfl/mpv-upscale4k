@@ -30,10 +30,10 @@
 //!TYPE float
 1.0
 
-//!HOOK POSTKERNEL
+//!HOOK MAIN
 //!BIND HOOKED
 //!BIND PREV
-//!DESC Masked anti-halo luma-only sharpen with motion gating
+//!DESC [Custom] Masked anti-halo luma-only sharpen with motion gating
 
 // BT.709 luma weights
 const vec3 LUMA = vec3(0.299, 0.587, 0.114);

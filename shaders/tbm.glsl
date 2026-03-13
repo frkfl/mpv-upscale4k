@@ -10,9 +10,9 @@
 //!TYPE float
 0.350
 
-//!HOOK POSTKERNEL
+//!HOOK MAIN
 //!BIND HOOKED
-//!DESC Texture Balance Map (TBM-lite v3, plane-aware)
+//!DESC [Custom] Texture Balance Map
 
 // BT.2020 luma (assume roughly linear-ish here)
 float luma_bt2020(vec3 c) {

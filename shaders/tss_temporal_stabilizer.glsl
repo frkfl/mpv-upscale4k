@@ -27,10 +27,10 @@
 //!TYPE float
 0.0
 
-//!HOOK POSTKERNEL
+//!HOOK MAIN
 //!BIND HOOKED
 //!BIND PREV
-//!DESC Temporal Structural Stabilizer (TSS) — deterministic temporal/spatial stabilizer
+//!DESC [Custom] Temporal Structural Stabilizer (TSS)
 
 // Helpers
 float saturate(float x){ return clamp(x, 0.0, 1.0); }

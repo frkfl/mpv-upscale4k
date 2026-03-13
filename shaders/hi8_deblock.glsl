@@ -20,7 +20,7 @@
 
 //!HOOK MAIN
 //!BIND HOOKED
-//!DESC Conditional deblock / degrid (BT.2020, low-variance only)
+//!DESC [Custom] Conditional deblock (hi8)
 
 const vec3  W2020 = vec3(0.2627, 0.6780, 0.0593);
 const float EPS   = 1e-6;

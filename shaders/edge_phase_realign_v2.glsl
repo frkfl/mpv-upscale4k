@@ -37,7 +37,7 @@
 //!HOOK POSTKERNEL
 //!BIND HOOKED
 //!BIND PREV
-//!DESC Edge Stabilization & Perceptual Phase Re-Alignment v2 (deterministic, perceptually tunable)
+//!DESC [Custom] Edge Stabilization & Perceptual Phase Re-Alignment v2 (deterministic, perceptually tunable)
 
 #define DEBUG_NONE       0
 #define DEBUG_EDGE       1

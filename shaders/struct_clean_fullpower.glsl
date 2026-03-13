@@ -1,32 +1,31 @@
-#version 450
-//!PARAM strength
+//!PARAM scf_strength
 //!TYPE float
 1.0
 
-//!PARAM radius
+//!PARAM scf_radius
 //!TYPE float
 3.0
 
-//!PARAM edge_protect
+//!PARAM scf_edge_protect
 //!TYPE float
 0.7
 
-//!PARAM chroma_weight
+//!PARAM scf_chroma_weight
 //!TYPE float
 0.6
 
-//!PARAM temporal_alpha
+//!PARAM scf_temporal_alpha
 //!TYPE float
 0.8
 
-//!PARAM global_gain
+//!PARAM scf_global_gain
 //!TYPE float
 1.0
 
-//!HOOK POSTKERNEL
+//!HOOK MAIN
 //!BIND HOOKED
 //!BIND PREV
-//!DESC Structural Cleaning Reinforcement Pass (Full-Power, Perceptual)
+//!DESC [Custom] Structural Cleaning Reinforcement Pass (Strong, Perceptual)
 
 // Debug modes (compile-time only)
 #define DEBUG_NONE       0
@@ -139,7 +138,6 @@ float weightedMedianSquare(sampler2D tex, vec2 uv, vec2 px, int chan, int rad, f
         }
     }
 
-    // Sort by value (ascending) while carrying weights (simple insertion sort)
     for(int a=0;a<idx;a++){
         int k = a;
         for(int b=a+1;b<idx;b++){
@@ -151,7 +149,6 @@ float weightedMedianSquare(sampler2D tex, vec2 uv, vec2 px, int chan, int rad, f
         }
     }
 
-    // Cumulative weight to 0.5
     float W = 0.0;
     for(int n=0;n<idx;n++) W += wts[n];
     float half = 0.5 * W;
@@ -163,7 +160,6 @@ float weightedMedianSquare(sampler2D tex, vec2 uv, vec2 px, int chan, int rad, f
     return vals[max(idx-1,0)];
 }
 
-// 3x3 mean absolute difference (motion metric)
 float motion3x3_Y(sampler2D curr, sampler2D prev, vec2 uv, vec2 px){
     float acc = 0.0;
     for(int y=-1;y<=1;y++)
@@ -180,24 +176,21 @@ vec4 hook(){
     vec2 uv = HOOKED_pos;
     vec2 px = 1.0 / HOOKED_size.xy;
 
-    // Clamp parameters to safety
-    float Strength   = clamp(strength,        0.0, CAP_STRENGTH);
-    float RadiusF    = clamp(radius,          MIN_RADIUS, CAP_RADIUS);
+    float Strength   = clamp(scf_strength,        0.0, CAP_STRENGTH);
+    float RadiusF    = clamp(scf_radius,          MIN_RADIUS, CAP_RADIUS);
     int   Rad        = int(floor(RadiusF + 0.5));
     Rad = clamp(Rad, 1, 5);
-    float EdgeProtect= clamp(edge_protect,    0.0, CAP_EDGE_PROTECT);
-    float CbCrWeight = clamp(chroma_weight,   0.0, CAP_CHROMA_WEIGHT);
-    float TempAlpha  = clamp(temporal_alpha,  0.0, CAP_TEMPORAL);
-    float GlobalGain = clamp(global_gain,     0.0, CAP_GLOBAL_GAIN);
+    float EdgeProtect= clamp(scf_edge_protect,    0.0, CAP_EDGE_PROTECT);
+    float CbCrWeight = clamp(scf_chroma_weight,   0.0, CAP_CHROMA_WEIGHT);
+    float TempAlpha  = clamp(scf_temporal_alpha,  0.0, CAP_TEMPORAL);
+    float GlobalGain = clamp(scf_global_gain,     0.0, CAP_GLOBAL_GAIN);
 
-    // -- 3) Preprocessing: RGB -> YCbCr
     vec3 rgb_in = fetchRGB(HOOKED_tex, uv);
     vec3 ycc_in = RGB_to_YCbCr(rgb_in);
     float Yorig = ycc_in.x;
     float Cborig = ycc_in.y;
     float Crorig = ycc_in.z;
 
-    // -- 4) Local Energy Field Estimation
     float meanY, varY;
     gaussian5x5_stats(HOOKED_tex, uv, px, RadiusF, meanY, varY);
 
@@ -208,9 +201,8 @@ vec4 hook(){
 
     float edge_mask = exp(-grad_mag * 10.0);
     float E = mix(1.0, edge_mask, EdgeProtect);
-    float N = noise_p * E; // cleaning weight
+    float N = noise_p * E;
 
-    // -- 5) Adaptive Bilateral-Median Cleaning
     float Y_med  = weightedMedianSquare(HOOKED_tex, uv, px, 0, Rad, 1.0, varY, RadiusF);
     float Cb_med = weightedMedianSquare(HOOKED_tex, uv, px, 1, Rad, 1.0, varY, RadiusF);
     float Cr_med = weightedMedianSquare(HOOKED_tex, uv, px, 2, Rad, 1.0, varY, RadiusF);
@@ -220,7 +212,6 @@ vec4 hook(){
     float Cb_clean = mix(Cborig, Cb_med, CbCrWeight * k);
     float Cr_clean = mix(Crorig, Cr_med, CbCrWeight * k);
 
-    // -- 6) Temporal Stabilization (always active)
     vec3 prev_rgb = fetchRGB(PREV_tex, uv);
     vec3 prev_ycc = RGB_to_YCbCr(prev_rgb);
     float motion = motion3x3_Y(HOOKED_tex, PREV_tex, uv, px);
@@ -228,11 +219,10 @@ vec4 hook(){
     bool cond_b = (motion < 0.05);
     float cond  = cond_b ? 1.0 : 0.0;
 
-    float Yt  = mix(Y_clean,  mix(prev_ycc.x, Y_clean, 1.0 - alpha), cond); // cond ? mix(prev, clean, 1-alpha) : clean
+    float Yt  = mix(Y_clean,  mix(prev_ycc.x, Y_clean, 1.0 - alpha), cond);
     float Cbt = mix(Cb_clean, mix(prev_ycc.y, Cb_clean, 1.0 - alpha), cond);
     float Crt = mix(Cr_clean, mix(prev_ycc.z, Cr_clean, 1.0 - alpha), cond);
 
-    // -- 7) Global Gain & Recomposition
     float Yf  = Yorig  + GlobalGain * (Yt  - Yorig);
     float Cbf = Cborig + GlobalGain * (Cbt - Cborig);
     float Crf = Crorig + GlobalGain * (Crt - Crorig);

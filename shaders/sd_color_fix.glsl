@@ -18,7 +18,7 @@
 
 //!HOOK MAIN
 //!BIND HOOKED
-//!DESC SD color / luminance correction (BT.601 reference)
+//!DESC [Custom] SD color / luminance correction (BT.601 reference)
 
 vec3 to_bt601(vec3 c) {
     // Converts RGB assuming it was already in BT.601 range

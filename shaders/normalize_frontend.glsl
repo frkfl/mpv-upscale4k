@@ -47,11 +47,10 @@
 //!TYPE float
 0.30
 
-//!DESC Normalization Front-End v2 (Deterministic / linear / pre-upscale)
 //!HOOK MAIN
 //!BIND HOOKED
+//!DESC [Custom] Normalization Front-End
 
-// ---- Constants ----
 const float EPS  = 1e-6;
 const vec3  W601 = vec3(0.299, 0.587, 0.114); // Rec.601 luma (linear)
 

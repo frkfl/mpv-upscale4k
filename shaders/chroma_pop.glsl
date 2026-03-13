@@ -20,7 +20,7 @@
 
 //!HOOK POSTKERNEL
 //!BIND HOOKED
-//!DESC Chroma Pop (local chroma contrast, luma-safe)
+//!DESC [Custom] Chroma Pop
 
 // sRGB <-> linear helpers
 vec3 toLin(vec3 c, float g) {

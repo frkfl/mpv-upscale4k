@@ -32,7 +32,7 @@
 
 //!HOOK MAIN
 //!BIND HOOKED
-//!DESC OkLCH cinema-style vibrance (HDR-safe, skin-protected, chroma-tamed)
+//!DESC [Custom] OkLCH cinema-style vibrance (HDR-safe, skin-protected, chroma-tamed)
 
 // Small epsilon to keep cube roots happy
 const float EPS = 1e-6;

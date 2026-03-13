@@ -1,25 +1,24 @@
-//!PARAM edge_strength
+//!PARAM sma_edge_strength
 //!TYPE float
-0.4
+0.68
 
-//!PARAM corner_strength
+//!PARAM sma_corner_strength
 //!TYPE float
-0.25
+0.22
 
-//!PARAM gamma
+//!PARAM sma_gamma
 //!TYPE float
 1.0
 
-//!HOOK POSTKERNEL
+//!HOOK MAIN
 //!BIND HOOKED
-//!DESC Simple SMAA-lite edge smoother for mpv
+//!DESC [Custom] SMAA Anti Aliasing
 
 /*
  * A simplified single-pass approximation of SMAA.
  * Detects edges via luminance contrast and blends adjacent pixels to smooth them.
  * Works well after upscalers and before sharpen/grain.
  */
-
 const vec3 LUMA = vec3(0.299, 0.587, 0.114);
 
 // Local edge contrast
@@ -34,27 +33,28 @@ vec4 hook() {
     vec2 texel = 1.0 / HOOKED_size.xy;
 
     // Edge detection
-    float eN  = edge(uv, vec2(0.0, -texel.y));
-    float eS  = edge(uv, vec2(0.0,  texel.y));
-    float eE  = edge(uv, vec2( texel.x, 0.0));
-    float eW  = edge(uv, vec2(-texel.x, 0.0));
+    float eN = edge(uv, vec2(0.0, -texel.y));
+    float eS = edge(uv, vec2(0.0, texel.y));
+    float eE = edge(uv, vec2( texel.x, 0.0));
+    float eW = edge(uv, vec2(-texel.x, 0.0));
     float eNE = edge(uv, vec2( texel.x, -texel.y));
-    float eSW = edge(uv, vec2(-texel.x,  texel.y));
+    float eSW = edge(uv, vec2(-texel.x, texel.y));
 
     float horiz = eE + eW + 0.5 * (eNE + eSW);
-    float vert  = eN + eS + 0.5 * (eNE + eSW);
-    float edge_intensity = pow(max(horiz, vert), gamma);
+    float vert = eN + eS + 0.5 * (eNE + eSW);
+
+    float edge_intensity = pow(max(horiz, vert), sma_gamma);
 
     // Main and neighbors
-    vec4 c  = HOOKED_tex(uv);
+    vec4 c = HOOKED_tex(uv);
     vec4 cx = (HOOKED_tex(uv + vec2(texel.x, 0.0)) + HOOKED_tex(uv - vec2(texel.x, 0.0))) * 0.5;
     vec4 cy = (HOOKED_tex(uv + vec2(0.0, texel.y)) + HOOKED_tex(uv - vec2(0.0, texel.y))) * 0.5;
     vec4 cd = (HOOKED_tex(uv + vec2(texel.x, texel.y)) + HOOKED_tex(uv - vec2(texel.x, texel.y))) * 0.5;
 
     // Blend weights
-    float w_main   = 1.0 - edge_intensity * edge_strength;
-    float w_linear = edge_intensity * edge_strength * 0.5;
-    float w_diag   = edge_intensity * corner_strength * 0.5;
+    float w_main = 1.0 - edge_intensity * sma_edge_strength;
+    float w_linear = edge_intensity * sma_edge_strength * 0.5;
+    float w_diag = edge_intensity * sma_corner_strength * 0.5;
 
     vec3 blended = (c.rgb * w_main +
                     cx.rgb * w_linear +

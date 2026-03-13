@@ -36,7 +36,7 @@
 
 //!HOOK MAIN
 //!BIND HOOKED
-//!DESC Universal skin tone perceptual correction (refined undertone)
+//!DESC [Custom] Skin tone refinements
 
 // Helper functions
 float luma(vec3 c){ return dot(c, vec3(0.2627,0.6780,0.0593)); }

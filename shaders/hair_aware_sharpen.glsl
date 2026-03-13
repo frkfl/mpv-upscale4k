@@ -1,27 +1,27 @@
-//!PARAM sharp_amt
+//!PARAM has_sharp_amt
 //!TYPE float
 0.28
 
-//!PARAM hf_gain
+//!PARAM has_hf_gain
 //!TYPE float
 1.60
 
-//!PARAM flat_guard
+//!PARAM has_flat_guard
 //!TYPE float
 0.85
 
-//!PARAM temp_sense
+//!PARAM has_temp_sense
 //!TYPE float
 0.65
 
-//!PARAM clamp_amt
+//!PARAM has_clamp_amt
 //!TYPE float
 0.030
 
-//!HOOK POSTKERNEL
+//!HOOK MAIN
 //!BIND HOOKED
 //!BIND PREV
-//!DESC Hair-aware adaptive sharpen (temporal + HF mask)
+//!DESC [Custom] Hair-aware adaptive sharpen
 
 // Luma weights (BT.709)
 const vec3 LW = vec3(0.299, 0.587, 0.114);
@@ -91,17 +91,17 @@ vec4 hook() {
     float stab = temporal_stability(uv);
 
     // Weight favors HF regions that are temporally stable
-    float w = hf * hf_gain * mix(0.0, 1.0, pow(stab, temp_sense));
+    float w = hf * has_hf_gain * mix(0.0, 1.0, pow(stab, has_temp_sense));
     w = clamp(w, 0.0, 1.5);
 
     // Protect flat regions
-    w = mix(w, 0.0, flat_guard * (1.0 - hf));
+    w = mix(w, 0.0, has_flat_guard * (1.0 - hf));
 
     // Detail signal with clamp
     vec3 detail = unsharp3x3(uv);
-    vec3 add = clamp(detail, vec3(-clamp_amt), vec3(clamp_amt));
+    vec3 add = clamp(detail, vec3(-has_clamp_amt), vec3(has_clamp_amt));
 
     // Apply sharpening
-    vec3 outc = base + add * (sharp_amt * w);
+    vec3 outc = base + add * (has_sharp_amt * w);
     return vec4(outc, 1.0);
 }

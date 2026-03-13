@@ -24,7 +24,7 @@
 
 //!HOOK MAIN
 //!BIND HOOKED
-//!DESC Full-range shadow-band lift (local gamma curve, black-safe)
+//!DESC [Custom] Full-range shadow-band lift (local gamma curve, black-safe)
 
 const float EPS  = 1e-6;
 const vec3  W709 = vec3(0.2126, 0.7152, 0.0722);

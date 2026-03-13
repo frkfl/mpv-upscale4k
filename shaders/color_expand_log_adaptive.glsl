@@ -31,7 +31,7 @@
 
 //!HOOK MAIN
 //!BIND HOOKED
-//!DESC Adaptive log color expansion (highlight-safe, no white crush)
+//!DESC [Custom] Adaptive log color expansion (highlight-safe, no white crush)
 
 const float EPS = 1e-5;
 const vec3  W2020 = vec3(0.2627,0.6780,0.0593);

@@ -19,8 +19,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-// Description: HQ/nlmeans_light.glsl: Slow, but higher quality. Tuned for light noise.
-// Changed to super light (rough attempt)
+// Description: HQ/nlmeans.glsl: Slow, but higher quality.
 
 // The following is shader code injected from ./nlmeans_template
 /* vi: ft=c
@@ -46,10 +45,16 @@
 
 // Description: nlmeans.glsl: Default profile, general purpose, tuned for low noise
 
+//!PARAM nl_strength
+//!TYPE float
+//!MINIMUM 0.0
+//!MAXIMUM 2.0
+1.0
+
 //!HOOK LUMA
 //!HOOK CHROMA
 //!BIND HOOKED
-//!DESC Non-local means (nlmeans.glsl)
+//!DESC [Custom]Non-local means (nlmeans.glsl)
 //!SAVE G
 
 
@@ -61,9 +66,9 @@
 
 // Denoising factor (sigma, higher means more blur)
 #ifdef LUMA_raw
-#define S 1.0727641053003422
+#define S 3.8070155534513885
 #else
-#define S 1.041932232127336
+#define S 3.8391080491674847
 #endif
 
 /* Noise resistant adaptive sharpening
@@ -101,9 +106,9 @@
  * AKA the center weight, the weight of the pixel-of-interest.
  */
 #ifdef LUMA_raw
-#define SW 0.68438989654960287
+#define SW 0.31161702146553555
 #else
-#define SW 0.3498447187063041
+#define SW 0.5455997832190327
 #endif
 
 /* Spatial kernel
@@ -120,12 +125,12 @@
  */
 #ifdef LUMA_raw
 #define SST 1
-#define SS 1.5630941851001529
+#define SS 1.3426595626243674
 #define PST 0
 #define PSS 0.0
 #else
 #define SST 1
-#define SS 2.4699872219453079
+#define SS 0.6454412326714503
 #define PST 0
 #define PSS 0.0
 #endif
@@ -236,7 +241,7 @@
  */
 #ifdef LUMA_raw
 #define WD 2
-#define WDT 2.8324422316745451
+#define WDT 0.4893345936928189
 #define WDP 0.0
 #define WDS 1.0
 #else
@@ -411,7 +416,7 @@
  * RO: range kernel (takes patch differences)
  */
 #ifdef LUMA_raw
-#define RO 0.00007671492602357283
+#define RO 0.00014746957936752556
 #else
 #define RO 9.773746446023492e-05
 #endif
@@ -1383,7 +1388,7 @@ vec4 hook()
 //!BIND G
 //!WIDTH G.w
 //!HEIGHT G.h
-//!DESC Non-local means (Guide, share)
+//!DESC [Custom]Non-local means (Guide, share)
 //!SAVE GC
 
 vec4 hook()
@@ -1396,7 +1401,7 @@ vec4 hook()
 //!BIND HOOKED
 //!BIND G
 //!BIND GC
-//!DESC Non-local means (HQ/nlmeans_super_light.glsl)
+//!DESC [Custom]Non-local means (HQ/nlmeans.glsl)
 
 
 
@@ -1407,9 +1412,9 @@ vec4 hook()
 
 // Denoising factor (sigma, higher means more blur)
 #ifdef LUMA_raw
-#define S 0.23241027416666376
+#define S 1.0891793821856746
 #else
-#define S 0.291177899813322
+#define S 0.9261970284633889
 #endif
 
 /* Noise resistant adaptive sharpening
@@ -1447,9 +1452,9 @@ vec4 hook()
  * AKA the center weight, the weight of the pixel-of-interest.
  */
 #ifdef LUMA_raw
-#define SW 4.3413048667402414
+#define SW 1.4918935240131503
 #else
-#define SW 1.1508146686987937
+#define SW 3.3672059070451072
 #endif
 
 /* Spatial kernel
@@ -1466,12 +1471,12 @@ vec4 hook()
  */
 #ifdef LUMA_raw
 #define SST 1
-#define SS 0.06363102604167671
+#define SS 0.12303243413917926
 #define PST 0
 #define PSS 0.0
 #else
 #define SST 1
-#define SS 0.03485858522314121
+#define SS 0.04608821797323175
 #define PST 0
 #define PSS 0.0
 #endif
@@ -1582,8 +1587,8 @@ vec4 hook()
  */
 #ifdef LUMA_raw
 #define WD 1
-#define WDT 0.05768251183652138
-#define WDP 0.2787522313027192
+#define WDT 0.0882286053470455
+#define WDP 1.060997583415308
 #define WDS 1.0
 #else
 #define WD 0
@@ -1759,7 +1764,7 @@ vec4 hook()
 #ifdef LUMA_raw
 #define RO 2.603846182420303e-05
 #else
-#define RO 8.0420254950129188e-05
+#define RO 0.00012555521925975498
 #endif
 
 /* Sampling method
@@ -2719,6 +2724,13 @@ vec4 hook()
 	return vec4(0.5);
 #endif
 
-	return unval(result);
+	// Blending to reduce denoise
+	vec4 denoised = unval(result);
+	vec4 original = HOOKED_tex(HOOKED_pos);
+
+	// Blend in linear space (this shader operates in linear)
+	vec3 blended = mix(original.rgb, denoised.rgb, nl_strength);
+
+	return vec4(blended, original.a);
 }
 

@@ -44,7 +44,7 @@
 
 //!HOOK POSTKERNEL
 //!BIND HOOKED
-//!DESC Natural CRT (scanline + triad mask) with color-preserving compensation
+//!DESC [Custom] CRT-like smoothing
 
 // Luma (BT.709)
 float luma(vec3 c) { return dot(c, vec3(0.2126, 0.7152, 0.0722)); }

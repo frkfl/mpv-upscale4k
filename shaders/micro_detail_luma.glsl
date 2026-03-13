@@ -8,9 +8,9 @@
 //!TYPE float
 0.004
 
-//!HOOK POSTKERNEL
+//!HOOK MAIN
 //!BIND HOOKED
-//!DESC Micro Detail Enhancer (Luma-only, edge-gated)
+//!DESC [Custom] Micro-detail Enhancer
 
 // BT.2020 luma (linear RGB)
 float luma2020(vec3 c) {

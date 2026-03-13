@@ -18,9 +18,9 @@
 //!TYPE float
 2.20
 
-//!HOOK POSTKERNEL
+//!HOOK MAIN
 //!BIND HOOKED
-//!DESC Micro-Contrast (local tone separation)
+//!DESC [Custom] Micro-Contrast addition
 
 // Compute luma (BT.709)
 float luma(vec3 c) {

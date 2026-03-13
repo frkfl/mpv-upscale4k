@@ -24,9 +24,9 @@
 //!TYPE float
 0.90
 
-//!HOOK POSTKERNEL
+//!HOOK MAIN
 //!BIND HOOKED
-//!DESC Texture Balance Map (local acutance equalizer)
+//!DESC [Custom] Texture Balance Map
 
 vec3 fetch_rgb(vec2 uv) {
     return HOOKED_tex(uv).rgb;

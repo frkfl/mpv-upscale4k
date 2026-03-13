@@ -18,9 +18,10 @@
 //!TYPE float
 1.0
 
-//!HOOK POSTKERNEL
+//!HOOK MAIN
 //!BIND HOOKED
-//!DESC Micro entropy grain for pre-downscale (luma-biased, blue-noise-ish, ultra low energy)
+//!DESC [Custom] Micro entropy grain for pre-downscale
+
 
 float luma2020(vec3 c) { return dot(c, vec3(0.2627, 0.6780, 0.0593)); }
 

@@ -10,9 +10,9 @@
 //!TYPE float
 1.00
 
-//!HOOK POSTKERNEL
+//!HOOK MAIN
 //!BIND HOOKED
-//!DESC BT.601/709 → BT.2020 normalizer (auto)
+//!DESC [Custom] BT.601/709 → BT.2020 normalizer
 
 // OkLab (Björn Ottosson), using linear RGB input
 const mat3 OKLAB_M1 = mat3(

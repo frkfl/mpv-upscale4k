@@ -44,7 +44,7 @@
 
 //!HOOK MAIN
 //!BIND HOOKED
-//!DESC Mild luma S-curve (full-range, black-safe, non-HDR)
+//!DESC [Custom] Full Color Range improvement (non-HDR)
 
 const float EPS = 1e-6;
 
