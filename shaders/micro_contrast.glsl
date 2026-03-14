@@ -1,20 +1,20 @@
-//!PARAM radius
+//!PARAM mc_radius
 //!TYPE float
 1.0
 
-//!PARAM amount
+//!PARAM mc_amount
 //!TYPE float
 0.12
 
-//!PARAM threshold
+//!PARAM mc_threshold
 //!TYPE float
 0.02
 
-//!PARAM gamma_in
+//!PARAM mc_gamma_in
 //!TYPE float
 2.20
 
-//!PARAM gamma_out
+//!PARAM mc_gamma_out
 //!TYPE float
 2.20
 
@@ -40,20 +40,21 @@ vec3 toGam(vec3 c, float g) {
 vec4 hook() {
     vec2 uv = HOOKED_pos;
     vec2 px = 1.0 / HOOKED_size.xy;
-    float r = radius;
+
+    float r = mc_radius;
 
     // Fetch current pixel in linear light
-    vec3 c = toLin(HOOKED_tex(uv).rgb, gamma_in);
+    vec3 c = toLin(HOOKED_tex(uv).rgb, mc_gamma_in);
 
     // 3×3 blur neighborhood
-    vec3 n  = toLin(HOOKED_tex(uv + vec2(0.0, -px.y * r)).rgb, gamma_in);
-    vec3 s  = toLin(HOOKED_tex(uv + vec2(0.0,  px.y * r)).rgb, gamma_in);
-    vec3 e  = toLin(HOOKED_tex(uv + vec2( px.x * r, 0.0)).rgb, gamma_in);
-    vec3 w  = toLin(HOOKED_tex(uv + vec2(-px.x * r, 0.0)).rgb, gamma_in);
-    vec3 ne = toLin(HOOKED_tex(uv + vec2( px.x * r, -px.y * r)).rgb, gamma_in);
-    vec3 nw = toLin(HOOKED_tex(uv + vec2(-px.x * r, -px.y * r)).rgb, gamma_in);
-    vec3 se = toLin(HOOKED_tex(uv + vec2( px.x * r,  px.y * r)).rgb, gamma_in);
-    vec3 sw = toLin(HOOKED_tex(uv + vec2(-px.x * r,  px.y * r)).rgb, gamma_in);
+    vec3 n = toLin(HOOKED_tex(uv + vec2(0.0, -px.y * r)).rgb, mc_gamma_in);
+    vec3 s = toLin(HOOKED_tex(uv + vec2(0.0, px.y * r)).rgb, mc_gamma_in);
+    vec3 e = toLin(HOOKED_tex(uv + vec2( px.x * r, 0.0)).rgb, mc_gamma_in);
+    vec3 w = toLin(HOOKED_tex(uv + vec2(-px.x * r, 0.0)).rgb, mc_gamma_in);
+    vec3 ne = toLin(HOOKED_tex(uv + vec2( px.x * r, -px.y * r)).rgb, mc_gamma_in);
+    vec3 nw = toLin(HOOKED_tex(uv + vec2(-px.x * r, -px.y * r)).rgb, mc_gamma_in);
+    vec3 se = toLin(HOOKED_tex(uv + vec2( px.x * r, px.y * r)).rgb, mc_gamma_in);
+    vec3 sw = toLin(HOOKED_tex(uv + vec2(-px.x * r, px.y * r)).rgb, mc_gamma_in);
 
     // Simple average blur
     vec3 blur = (c + n + s + e + w + ne + nw + se + sw) * (1.0 / 9.0);
@@ -62,11 +63,11 @@ vec4 hook() {
     vec3 diff = c - blur;
 
     // Gating to avoid noise amplification
-    float gate = smoothstep(threshold, 3.0 * threshold, abs(luma(diff)));
+    float gate = smoothstep(mc_threshold, 3.0 * mc_threshold, abs(luma(diff)));
 
     // Apply contrast boost
-    vec3 boosted = c + diff * (amount * gate);
+    vec3 boosted = c + diff * (mc_amount * gate);
 
     // Reapply output gamma
-    return vec4(toGam(boosted, gamma_out), 1.0);
+    return vec4(toGam(boosted, mc_gamma_out), 1.0);
 }
