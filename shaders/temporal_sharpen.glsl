@@ -1,105 +1,88 @@
 //!PARAM tsh_strength
 //!TYPE float
-0.25
-
-//!PARAM tsh_motion_sense
-//!TYPE float
-0.60
-
-//!PARAM tsh_decay
-//!TYPE float
-0.80
+//!MINIMUM 0.0
+//!MAXIMUM 1.0
+0.35
 
 //!PARAM tsh_radius
 //!TYPE float
-1.00
-
-//!PARAM tsh_clamp_amt
-//!TYPE float
-0.030
-
-//!PARAM tsh_thresh
-//!TYPE float
-0.020
-
-//!PARAM tsh_gamma_in
-//!TYPE float
-2.20
-
-//!PARAM tsh_gamma_out
-//!TYPE float
-2.20
+//!MINIMUM 0.5
+//!MAXIMUM 3.0
+1.0
 
 //!HOOK MAIN
 //!BIND HOOKED
-//!BIND PREV_FRAME
-//!SAVE PREV_FRAME
+//!BIND TSH_PREV
+//!SAVE MAIN
 //!WIDTH HOOKED.w
 //!HEIGHT HOOKED.h
 //!DESC [Custom] Temporal Sharpen
 
 float luma(vec3 c) {
-    return dot(c, vec3(0.2126, 0.7152, 0.0722));
+    // BT.2020 coefficients
+    return dot(c, vec3(0.2627, 0.6780, 0.0593));
 }
 
-vec3 toLin(vec3 c, float g) {
-    return pow(max(c, 0.0), vec3(g > 0.0 ? 1.0 / g : 1.0));
+vec3 gaussBlur(vec2 uv, vec2 px, float r) {
+    vec3 c  = HOOKED_tex(uv).rgb;
+    vec3 n  = HOOKED_tex(uv + vec2( 0.0,      -px.y*r)).rgb;
+    vec3 s  = HOOKED_tex(uv + vec2( 0.0,       px.y*r)).rgb;
+    vec3 e  = HOOKED_tex(uv + vec2( px.x*r,    0.0   )).rgb;
+    vec3 w  = HOOKED_tex(uv + vec2(-px.x*r,    0.0   )).rgb;
+    vec3 ne = HOOKED_tex(uv + vec2( px.x*r,   -px.y*r)).rgb;
+    vec3 nw = HOOKED_tex(uv + vec2(-px.x*r,   -px.y*r)).rgb;
+    vec3 se = HOOKED_tex(uv + vec2( px.x*r,    px.y*r)).rgb;
+    vec3 sw = HOOKED_tex(uv + vec2(-px.x*r,    px.y*r)).rgb;
+    return c  * 0.375
+         + (n + s + e + w)     * 0.125
+         + (ne + nw + se + sw) * 0.0625;
 }
 
-vec3 toGam(vec3 c, float g) {
-    return pow(max(c, 0.0), vec3(g > 0.0 ? g : 1.0));
+vec3 gaussBlurPrev(ivec2 ipos, float r) {
+    ivec2 ir = ivec2(round(vec2(r)));
+    vec3 c  = imageLoad(TSH_PREV, ipos).rgb;
+    vec3 n  = imageLoad(TSH_PREV, ipos + ivec2( 0,      -ir.y)).rgb;
+    vec3 s  = imageLoad(TSH_PREV, ipos + ivec2( 0,       ir.y)).rgb;
+    vec3 e  = imageLoad(TSH_PREV, ipos + ivec2( ir.x,    0   )).rgb;
+    vec3 w  = imageLoad(TSH_PREV, ipos + ivec2(-ir.x,    0   )).rgb;
+    vec3 ne = imageLoad(TSH_PREV, ipos + ivec2( ir.x,   -ir.y)).rgb;
+    vec3 nw = imageLoad(TSH_PREV, ipos + ivec2(-ir.x,   -ir.y)).rgb;
+    vec3 se = imageLoad(TSH_PREV, ipos + ivec2( ir.x,    ir.y)).rgb;
+    vec3 sw = imageLoad(TSH_PREV, ipos + ivec2(-ir.x,    ir.y)).rgb;
+    return c  * 0.375
+         + (n + s + e + w)     * 0.125
+         + (ne + nw + se + sw) * 0.0625;
 }
 
 vec4 hook() {
-    vec2 uv = HOOKED_pos;
-    vec2 px = 1.0 / HOOKED_size.xy;
+    vec2  uv   = HOOKED_pos;
+    vec2  px   = 1.0 / HOOKED_size;
+    ivec2 ipos = ivec2(uv * HOOKED_size);
 
-    vec3 cur = toLin(HOOKED_tex(uv).rgb, tsh_gamma_in);
+    vec3 cur = HOOKED_tex(uv).rgb;
+    vec3 prv = imageLoad(TSH_PREV, ipos).rgb;
 
-    // On first frame PREV_FRAME is undefined → fallback to current
-    vec3 prv = toLin(PREV_FRAME_tex(uv).rgb, tsh_gamma_in);
-    if (frame == 0) {
-        prv = cur;
-    }
+    vec3 blur_cur = gaussBlur(uv, px, tsh_radius);
+    vec3 blur_prv = gaussBlurPrev(ipos, tsh_radius);
 
-    float r = tsh_radius;
+    vec3 hf_cur = cur - blur_cur;
+    vec3 hf_prv = prv - blur_prv;
 
-    vec3 c = cur;
-    vec3 n = toLin(HOOKED_tex(uv + vec2(0.0, -px.y * r)).rgb, tsh_gamma_in);
-    vec3 s = toLin(HOOKED_tex(uv + vec2(0.0, px.y * r)).rgb, tsh_gamma_in);
-    vec3 e = toLin(HOOKED_tex(uv + vec2( px.x * r, 0.0)).rgb, tsh_gamma_in);
-    vec3 w = toLin(HOOKED_tex(uv + vec2(-px.x * r, 0.0)).rgb, tsh_gamma_in);
-    vec3 ne = toLin(HOOKED_tex(uv + vec2( px.x * r, -px.y * r)).rgb, tsh_gamma_in);
-    vec3 nw = toLin(HOOKED_tex(uv + vec2(-px.x * r, -px.y * r)).rgb, tsh_gamma_in);
-    vec3 se = toLin(HOOKED_tex(uv + vec2( px.x * r, px.y * r)).rgb, tsh_gamma_in);
-    vec3 sw = toLin(HOOKED_tex(uv + vec2(-px.x * r, px.y * r)).rgb, tsh_gamma_in);
+    vec3 hf = mix(hf_cur, hf_prv, 0.4);
 
-    vec3 blur = (n + s + e + w + ne + nw + se + sw + c) * (1.0 / 9.0);
-    vec3 hf = c - blur;
+    float m    = abs(luma(cur) - luma(prv));
+    float calm = 1.0 - smoothstep(0.004, 0.025, m);
 
-    float hfl = luma(abs(hf));
-    float gate = smoothstep(tsh_thresh, 3.0 * tsh_thresh, hfl);
+    vec3 limit = 0.05 * (abs(hf_cur) + 1e-4);
+    vec3 add   = clamp(hf, -limit, limit) * (tsh_strength * calm);
 
-    float m = abs(luma(c) - luma(prv));
-    float calm = 1.0 - clamp(tsh_motion_sense * smoothstep(0.004, 0.020, m), 0.0, 1.0);
+    vec3 out_rgb = clamp(cur + add, 0.0, 1.0);
 
-    vec3 p_n = toLin(PREV_FRAME_tex(uv + vec2(0.0, -px.y * r)).rgb, tsh_gamma_in);
-    vec3 p_s = toLin(PREV_FRAME_tex(uv + vec2(0.0, px.y * r)).rgb, tsh_gamma_in);
-    vec3 p_e = toLin(PREV_FRAME_tex(uv + vec2( px.x * r, 0.0)).rgb, tsh_gamma_in);
-    vec3 p_w = toLin(PREV_FRAME_tex(uv + vec2(-px.x * r, 0.0)).rgb, tsh_gamma_in);
-    vec3 p_ne = toLin(PREV_FRAME_tex(uv + vec2( px.x * r, -px.y * r)).rgb, tsh_gamma_in);
-    vec3 p_nw = toLin(PREV_FRAME_tex(uv + vec2(-px.x * r, -px.y * r)).rgb, tsh_gamma_in);
-    vec3 p_se = toLin(PREV_FRAME_tex(uv + vec2( px.x * r, px.y * r)).rgb, tsh_gamma_in);
-    vec3 p_sw = toLin(PREV_FRAME_tex(uv + vec2(-px.x * r, px.y * r)).rgb, tsh_gamma_in);
-
-    vec3 p_blur = (p_n + p_s + p_e + p_w + p_ne + p_nw + p_se + p_sw + prv) * (1.0 / 9.0);
-    vec3 p_hf = prv - p_blur;
-
-    vec3 hf_temporal = mix(hf, p_hf, tsh_decay);
-
-    vec3 limit = tsh_clamp_amt * (abs(c - blur) + 1e-4);
-    vec3 add = clamp(hf_temporal, -limit, limit) * (tsh_strength * gate * calm);
-
-    vec3 out_lin = c + add;
-    return vec4(toGam(out_lin, tsh_gamma_out), 1.0);
+    imageStore(TSH_PREV, ipos, vec4(out_rgb, 1.0));
+    return vec4(out_rgb, 1.0);
 }
+
+//!TEXTURE TSH_PREV
+//!SIZE 3840 2160
+//!FORMAT rgba16f
+//!STORAGE
