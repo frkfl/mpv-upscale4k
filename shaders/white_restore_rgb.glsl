@@ -1,8 +1,8 @@
-//!PARAM strength
+//!PARAM wrr_strength
 //!TYPE float
 0.3
 
-//!PARAM threshold
+//!PARAM wrr_threshold
 //!TYPE float
 0.5
 
@@ -20,7 +20,7 @@ vec4 hook() {
     // Lower threshold  -> only near-white affected
     // Higher threshold -> more pixels affected
     // threshold = 100 -> basically whole picture considered “white”
-    float t = max(threshold, 0.0);
+    float t = max(wrr_threshold, 0.0);
     float gate = smoothstep(t, 1.0, P);  // gate grows as pixels approach “white”
 
     // Neutral reference (the "white" that chroma deviates from)
@@ -31,7 +31,7 @@ vec4 hook() {
 
     // Apply chroma expansion
     // scale = 1 + strength*gate;
-    float s = max(strength, 0.0);
+    float s = max(wrr_strength, 0.0);
     float scale = 1.0 + s * gate;
 
     vec3 outc = neutral + chroma * scale;

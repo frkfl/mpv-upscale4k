@@ -1,20 +1,20 @@
-//!PARAM amount
+//!PARAM cp_amount
 //!TYPE float
 0.12
 
-//!PARAM radius
+//!PARAM cp_radius
 //!TYPE float
 1.2
 
-//!PARAM clamp_c
+//!PARAM cp_clamp_c
 //!TYPE float
 0.06
 
-//!PARAM gamma_in
+//!PARAM cp_gamma_in
 //!TYPE float
 2.20
 
-//!PARAM gamma_out
+//!PARAM cp_gamma_out
 //!TYPE float
 2.20
 
@@ -41,32 +41,32 @@ mat3 YUV2RGB = inverse(RGB2YUV);
 vec4 hook() {
     vec2 uv = HOOKED_pos;
     vec2 px = 1.0 / HOOKED_size.xy;
-    float r = radius;
+    float r = cp_radius;
 
     // Source to linear YUV
     vec3 srgb = HOOKED_tex(uv).rgb;
-    vec3 lin  = toLin(srgb, gamma_in);
+    vec3 lin  = toLin(srgb, cp_gamma_in);
     vec3 yuv  = RGB2YUV * lin;
     float Y   = yuv.x;
 
     // 5-tap chroma blur (luma excluded)
     vec3 s = vec3(0.0);
-    s += RGB2YUV * toLin(HOOKED_tex(uv + vec2( 0.0,  0.0)).rgb, gamma_in);
-    s += RGB2YUV * toLin(HOOKED_tex(uv + vec2( px.x * r, 0.0)).rgb, gamma_in);
-    s += RGB2YUV * toLin(HOOKED_tex(uv + vec2(-px.x * r, 0.0)).rgb, gamma_in);
-    s += RGB2YUV * toLin(HOOKED_tex(uv + vec2(0.0,  px.y * r)).rgb, gamma_in);
-    s += RGB2YUV * toLin(HOOKED_tex(uv + vec2(0.0, -px.y * r)).rgb, gamma_in);
+    s += RGB2YUV * toLin(HOOKED_tex(uv + vec2( 0.0,  0.0)).rgb, cp_gamma_in);
+    s += RGB2YUV * toLin(HOOKED_tex(uv + vec2( px.x * r, 0.0)).rgb, cp_gamma_in);
+    s += RGB2YUV * toLin(HOOKED_tex(uv + vec2(-px.x * r, 0.0)).rgb, cp_gamma_in);
+    s += RGB2YUV * toLin(HOOKED_tex(uv + vec2(0.0,  px.y * r)).rgb, cp_gamma_in);
+    s += RGB2YUV * toLin(HOOKED_tex(uv + vec2(0.0, -px.y * r)).rgb, cp_gamma_in);
     s *= 0.2; // 1/5 average
 
     // Chroma contrast boost
     vec2 UV  = yuv.yz;
     vec2 UVb = s.yz;
     vec2 diff = UV - UVb;
-    vec2 add  = clamp(diff * amount, -clamp_c, clamp_c);
+    vec2 add  = clamp(diff * cp_amount, -cp_clamp_c, cp_clamp_c);
 
     vec3 yuv2 = vec3(Y, UV + add);
     vec3 out_lin  = YUV2RGB * yuv2;
-    vec3 out_srgb = toGam(out_lin, gamma_out);
+    vec3 out_srgb = toGam(out_lin, cp_gamma_out);
 
     return vec4(clamp(out_srgb, 0.0, 1.0), 1.0);
 }

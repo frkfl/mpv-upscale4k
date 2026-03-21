@@ -1,20 +1,20 @@
-//!PARAM strength
+//!PARAM hd_strength
 //!TYPE float
 0.7
 
-//!PARAM var_low
+//!PARAM hd_var_low
 //!TYPE float
 0.0003
 
-//!PARAM var_high
+//!PARAM hd_var_high
 //!TYPE float
 0.004
 
-//!PARAM edge_thresh
+//!PARAM hd_edge_thresh
 //!TYPE float
 0.05
 
-//!PARAM debug_mask
+//!PARAM hd_debug_mask
 //!TYPE float
 0.0
 
@@ -72,7 +72,7 @@ vec4 hook()
     float var = max(m2 - m1*m1, 0.0);
 
     // "flatness" mask: 1 in very flat areas, 0 in high-variance areas
-    float flat_mask = 1.0 - smoothstep(var_low, var_high, var);
+    float flat_mask = 1.0 - smoothstep(hd_var_low, hd_var_high, var);
 
     // Edge strength: maximum absolute difference to 4-neighborhood
     float dY_left  = abs(Y11 - Y01);
@@ -83,10 +83,10 @@ vec4 hook()
     float max_grad = max(max(dY_left, dY_right), max(dY_up, dY_down));
 
     // Edge mask: 1 on strong edges, 0 in smooth areas
-    float edge_mask = smoothstep(edge_thresh, edge_thresh * 2.0, max_grad);
+    float edge_mask = smoothstep(hd_edge_thresh, hd_edge_thresh * 2.0, max_grad);
 
     // Final smoothing weight: high in flat, non-edge regions
-    float w = strength * flat_mask * (1.0 - edge_mask);
+    float w = hd_strength * flat_mask * (1.0 - edge_mask);
     w = clamp(w, 0.0, 1.0);
 
     // --- 3. 3x3 Gaussian blur of RGB (only used where w>0) ---
@@ -99,7 +99,7 @@ vec4 hook()
 
     vec3 out_rgb = mix(c, blur, w);
 
-    if (debug_mask > 0.5) {
+    if (hd_debug_mask > 0.5) {
         // visualize where smoothing is applied:
         //  - pure original where w==0
         //  - greener where w is larger

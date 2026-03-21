@@ -1,12 +1,12 @@
-//!PARAM chroma_thresh
+//!PARAM acm_chroma_thresh
 //!TYPE float
 0.16
 
-//!PARAM chroma_soft
+//!PARAM acm_chroma_soft
 //!TYPE float
 0.06
 
-//!PARAM decision_strength
+//!PARAM acm_decision_strength
 //!TYPE float
 1.00
 
@@ -79,12 +79,12 @@ vec4 hook() {
     vec3 c2 = CORR_601_AS_709 * rgb_in;
 
     // Compute penalties
-    float p0 = chroma_penalty(c0, chroma_thresh, chroma_soft);
-    float p1 = chroma_penalty(c1, chroma_thresh, chroma_soft);
-    float p2 = chroma_penalty(c2, chroma_thresh, chroma_soft);
+    float p0 = chroma_penalty(c0, acm_chroma_thresh, acm_chroma_soft);
+    float p1 = chroma_penalty(c1, acm_chroma_thresh, acm_chroma_soft);
+    float p2 = chroma_penalty(c2, acm_chroma_thresh, acm_chroma_soft);
 
     // Push decision slightly towards "no correction" for low-strength settings
-    float k = clamp(decision_strength, 0.0, 1.0);
+    float k = clamp(acm_decision_strength, 0.0, 1.0);
     p1 *= mix(1.2, 1.0, k);
     p2 *= mix(1.2, 1.0, k);
 

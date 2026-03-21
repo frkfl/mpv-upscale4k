@@ -1,5 +1,5 @@
 #version 450
-//!PARAM strength
+//!PARAM scp_strength
 //!TYPE float
 1.00
 
@@ -82,7 +82,7 @@ vec4 hook() {
     float deltaY = clamp(Y_clean - Y, -DELTA_CLAMP, DELTA_CLAMP);
     float w = max(W_FLOOR, pow(P, W_EXP));
     float str = mix(1.0, EDGE_FALLOFF, gate);
-    float Y_final = Y + deltaY * w * str * strength;
+    float Y_final = Y + deltaY * w * str * scp_strength;
     vec3 compensated = color * (Y_final / (Y + 1e-5));
     vec3 color_final = mix(color, compensated, CHROMA_MIX);
     color_final = clamp(color_final, 0.0, 1.0);

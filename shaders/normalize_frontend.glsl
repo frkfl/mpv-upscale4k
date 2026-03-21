@@ -1,49 +1,49 @@
-//!PARAM th_low
+//!PARAM nf_th_low
 //!TYPE float
 0.035
-//!PARAM th_high
+//!PARAM nf_th_high
 //!TYPE float
 0.12
-//!PARAM shift_px
+//!PARAM nf_shift_px
 //!TYPE float
 0.75
-//!PARAM k_strength
+//!PARAM nf_k_strength
 //!TYPE float
 0.50
-//!PARAM alpha_yfb
+//!PARAM nf_alpha_yfb
 //!TYPE float
 0.10
-//!PARAM beta_cfb
+//!PARAM nf_beta_cfb
 //!TYPE float
 0.02
-//!PARAM blur_sigma
+//!PARAM nf_blur_sigma
 //!TYPE float
 1.20
-//!PARAM protect_gate
+//!PARAM nf_protect_gate
 //!TYPE float
 0.70
-//!PARAM shadow_thresh
+//!PARAM nf_shadow_thresh
 //!TYPE float
 0.05
-//!PARAM knee_gain
+//!PARAM nf_knee_gain
 //!TYPE float
 1.0
-//!PARAM ema_low
+//!PARAM nf_ema_low
 //!TYPE float
 0.15
-//!PARAM ema_high
+//!PARAM nf_ema_high
 //!TYPE float
 0.60
-//!PARAM motion_thr
+//!PARAM nf_motion_thr
 //!TYPE float
 0.03
-//!PARAM s_chroma_protect
+//!PARAM nf_s_chroma_protect
 //!TYPE float
 0.70
-//!PARAM e_ref
+//!PARAM nf_e_ref
 //!TYPE float
 0.08
-//!PARAM max_desat
+//!PARAM nf_max_desat
 //!TYPE float
 0.30
 
@@ -134,7 +134,7 @@ vec4 hook() {
     float eC = abs(Cb - Cb_l) + abs(Cr - Cr_l) +
                abs(Cb_r - Cb) + abs(Cr_r - Cr) + EPS;
 
-    float S_raw = smoothstep(th_low, th_high, abs(dC_sum) / eC);
+    float S_raw = smoothstep(nf_th_low, nf_th_high, abs(dC_sum) / eC);
     float sgn   = sign(Gy * dC_sum); // -1,0,+1
 
     // ---- Protection + chroma-energy adaptive scaling ----
@@ -142,10 +142,10 @@ vec4 hook() {
     float Yv = blur5_y(Y, vec2(0,1), pt, 1.0);
     float Ylp = 0.5*(Yh + Yv);
     float HF  = abs(Y - Ylp);
-    float Protect = clamp(HF * (1.0 - S_raw) * protect_gate, 0.0, 1.0);
+    float Protect = clamp(HF * (1.0 - S_raw) * nf_protect_gate, 0.0, 1.0);
 
     float e_local = (abs(Cb - Cb_l) + abs(Cr - Cr_l) + abs(Cb_r - Cb) + abs(Cr_r - Cr)) * 0.5;
-    float damp = clamp(1.0 - s_chroma_protect * (1.0 - clamp(e_local / max(e_ref, EPS), 0.0, 1.0)), 0.0, 1.0);
+    float damp = clamp(1.0 - nf_s_chroma_protect * (1.0 - clamp(e_local / max(nf_e_ref, EPS), 0.0, 1.0)), 0.0, 1.0);
 
     // Extra suppression in flat mid/high-luma areas to protect skin/whites
     float flat_gate = 1.0 - smoothstep(0.02, 0.12, HF);
@@ -153,15 +153,15 @@ vec4 hook() {
     float S = clamp(S_raw * (1.0 - Protect) * damp * mix(1.0, 0.6, flat_gate*lum_gate), 0.0, 1.0);
 
     // ---- Frequency split on chroma ----
-    vec3 blur_h = blur5_rgb(rgb, vec2(1,0), pt, blur_sigma);
-    vec3 blur_2 = blur5_rgb(blur_h, vec2(0,1), pt, blur_sigma);
+    vec3 blur_h = blur5_rgb(rgb, vec2(1,0), pt, nf_blur_sigma);
+    vec3 blur_2 = blur5_rgb(blur_h, vec2(0,1), pt, nf_blur_sigma);
     vec2 C_LF   = rgb_to_ycbcr601(blur_2).yz;
     vec2 C_HF   = vec2(Cb,Cr) - C_LF;
 
     // ---- Directional re-alignment (LF) ----
-    float dx = shift_px * pt.x * sgn;
+    float dx = nf_shift_px * pt.x * sgn;
     vec2 C_LF_shift = rgb_to_ycbcr601(HOOKED_tex(HOOKED_pos - vec2(dx, 0)).rgb).yz;
-    vec2 C_corr = mix(C_LF, C_LF_shift, k_strength * S);
+    vec2 C_corr = mix(C_LF, C_LF_shift, nf_k_strength * S);
 
     // One-sided smoothing opposite bleed
     float sdir = -sgn;
@@ -178,7 +178,7 @@ vec4 hook() {
     vec2 c1 = vec2(CbCr.x - 0.5, CbCr.y - 0.5);
     float r0 = length(c0);
     float r1 = length(c1);
-    float rmin = (1.0 - clamp(max_desat, 0.0, 1.0)) * r0;
+    float rmin = (1.0 - clamp(nf_max_desat, 0.0, 1.0)) * r0;
     if (r1 < rmin && r0 > 0.0) {
         c1 *= rmin / max(r1, EPS);
     }
@@ -187,19 +187,19 @@ vec4 hook() {
 
     // ---- Y<->C re-balance (soft) ----
     float fb = S * sgn;
-    float Yp = Y + alpha_yfb * fb * dC_sum;
-    float Cscale = 1.0 - beta_cfb * fb * Gy;
+    float Yp = Y + nf_alpha_yfb * fb * dC_sum;
+    float Cscale = 1.0 - nf_beta_cfb * fb * Gy;
     Cb *= Cscale;  Cr *= Cscale;
 
     // ---- Tone gate + soft-knee (knee off by default) ----
-    float gate = smoothstep(0.0, shadow_thresh, Yp);
+    float gate = smoothstep(0.0, nf_shadow_thresh, Yp);
     Cb = mix(0.5, Cb, gate);
     Cr = mix(0.5, Cr, gate);
-    float Yk = (knee_gain <= 1.0001) ? clamp(Yp, 0.0, 1.0) : soft_knee_log(clamp(Yp, 0.0, 1.0), knee_gain);
+    float Yk = (nf_knee_gain <= 1.0001) ? clamp(Yp, 0.0, 1.0) : soft_knee_log(clamp(Yp, 0.0, 1.0), nf_knee_gain);
 
     // ---- Temporal luma stabilization (deterministic, no storage) ----
-    float motion = step(motion_thr, abs(Y - Ylp));
-    float a = mix(ema_low, ema_high, motion);
+    float motion = step(nf_motion_thr, abs(Y - Ylp));
+    float a = mix(nf_ema_low, nf_ema_high, motion);
     float Yt = mix(Yk, mix(Yk, Ylp, 0.25), a * 0.2);
 
     // Back to RGB (stay linear; gpu-next handles presentation)

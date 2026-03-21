@@ -1,67 +1,67 @@
-//!PARAM dering_sigma
+//!PARAM pfs_dering_sigma
 //!TYPE float
 0.85
-//!PARAM dering_mix_max
+//!PARAM pfs_dering_mix_max
 //!TYPE float
 0.30
-//!PARAM agc_gamma
+//!PARAM pfs_agc_gamma
 //!TYPE float
 0.6
-//!PARAM agc_k0
+//!PARAM pfs_agc_k0
 //!TYPE float
 0.02
-//!PARAM agc_k1
+//!PARAM pfs_agc_k1
 //!TYPE float
 0.35
-//!PARAM agc_delta_max
+//!PARAM pfs_agc_delta_max
 //!TYPE float
 0.25
-//!PARAM agc_scale_kappa
+//!PARAM pfs_agc_scale_kappa
 //!TYPE float
 0.9
-//!PARAM unclip_shadow_power
+//!PARAM pfs_unclip_shadow_power
 //!TYPE float
 0.88
-//!PARAM unclip_highlight_power
+//!PARAM pfs_unclip_highlight_power
 //!TYPE float
 1.05
-//!PARAM unclip_eta_fill
+//!PARAM pfs_unclip_eta_fill
 //!TYPE float
 0.03
-//!PARAM hue_cap_deg_skin
+//!PARAM pfs_hue_cap_deg_skin
 //!TYPE float
 3.0
-//!PARAM hue_cap_deg_global
+//!PARAM pfs_hue_cap_deg_global
 //!TYPE float
 5.0
-//!PARAM sat_cap_skin
+//!PARAM pfs_sat_cap_skin
 //!TYPE float
 0.12
-//!PARAM sat_cap_global
+//!PARAM pfs_sat_cap_global
 //!TYPE float
 0.20
-//!PARAM meanY_guard_pct
+//!PARAM pfs_meanY_guard_pct
 //!TYPE float
 0.005
-//!PARAM ring_kappa
+//!PARAM pfs_ring_kappa
 //!TYPE float
 0.5
-//!PARAM ring_gain
+//!PARAM pfs_ring_gain
 //!TYPE float
 3.0
-//!PARAM protect_grad_lo
+//!PARAM pfs_protect_grad_lo
 //!TYPE float
 0.06
-//!PARAM protect_grad_hi
+//!PARAM pfs_protect_grad_hi
 //!TYPE float
 0.16
-//!PARAM motion_lo
+//!PARAM pfs_motion_lo
 //!TYPE float
 0.01
-//!PARAM motion_hi
+//!PARAM pfs_motion_hi
 //!TYPE float
 0.03
-//!PARAM highlights_gate_Y
+//!PARAM pfs_highlights_gate_Y
 //!TYPE float
 0.85
 
@@ -109,7 +109,7 @@ float skin_mask(vec2 C){
 float motion_mask(vec2 p){
     vec2 d = HOOKED_pt * 1.5;
     float a = abs(luma_at(p + d) - luma_at(p - d));
-    return sstep(motion_lo, motion_hi, a);
+    return sstep(pfs_motion_lo, pfs_motion_hi, a);
 }
 
 // Directional 3-tap FIR blur along a given normal (weights 0.25,0.5,0.25)
@@ -175,7 +175,7 @@ vec4 hook(){
     vec2 n_edge = vec2(-gY.y, gY.x);
 
     // Protect mask via gradient magnitude (cheaper than DoG)
-    float Protect = sstep(protect_grad_lo, protect_grad_hi, length(gY));
+    float Protect = sstep(pfs_protect_grad_lo, pfs_protect_grad_hi, length(gY));
 
     // ===== 1) Auto Dering Detector (cheap oscillation metric) =====
     // 3-sample Cb/Cr along normal: C[-1], C0, C[+1]
@@ -193,32 +193,32 @@ vec4 hook(){
 
     // Normalize by local chroma energy
     float E    = length(Cc) + EPS;
-    float Sraw = O / (O + ring_kappa * E);
-    float Sring= clamp(ring_gain * Sraw, 0.0, 2.0);
+    float Sraw = O / (O + pfs_ring_kappa * E);
+    float Sring= clamp(pfs_ring_gain * Sraw, 0.0, 2.0);
 
     // Directional 3-tap FIR along normal (zero phase) + capped mix
-    float w_ring = min(0.30 * G_from_S(Sring) * (1.0 - Protect), dering_mix_max);
+    float w_ring = min(0.30 * G_from_S(Sring) * (1.0 - Protect), pfs_dering_mix_max);
     vec2  C_der  = mix(Cc, blur3_chroma(p, n_edge), w_ring);
 
     // ===== 2) Auto Chroma Gain Compensation (hue-preserving) =====
-    float g_rel = A / (EPS + pow(max(meanY, EPS), agc_gamma));
-    float g_tgt = agc_k0 + agc_k1 * pow(max(meanY, EPS), agc_gamma);
-    float delta = clamp((g_rel - g_tgt) / max(g_tgt, EPS), -agc_delta_max, agc_delta_max);
+    float g_rel = A / (EPS + pow(max(meanY, EPS), pfs_agc_gamma));
+    float g_tgt = pfs_agc_k0 + pfs_agc_k1 * pow(max(meanY, EPS), pfs_agc_gamma);
+    float delta = clamp((g_rel - g_tgt) / max(g_tgt, EPS), -pfs_agc_delta_max, pfs_agc_delta_max);
 
     float Q = varY / (varY + 0.01*0.01);
     float S_agc = 1.4; // active by default
     float W = 0.5 * abs(delta) * Q * G_from_S(clamp(S_agc,0.0,2.0));
-    W *= mix(1.0, 0.5, step(highlights_gate_Y, Yc)); // highlight guard
+    W *= mix(1.0, 0.5, step(pfs_highlights_gate_Y, Yc)); // highlight guard
 
     float sgn   = (delta > 0.0) ? 1.0 : -1.0;
-    float scale = 1.0 - sgn * agc_scale_kappa * W;
+    float scale = 1.0 - sgn * pfs_agc_scale_kappa * W;
 
     // Skin guard: cap saturation delta
     float skin  = skin_mask(C_der);
     float sat0  = length(C_der);
     float sat1  = length(C_der * scale);
     float dsat  = sat1 - sat0;
-    float ds_cap= mix(sat_cap_global, sat_cap_skin, skin);
+    float ds_cap= mix(pfs_sat_cap_global, pfs_sat_cap_skin, skin);
     float sat1c = sat0 + clamp(dsat, -ds_cap, ds_cap);
     float scl_c = (sat0 > EPS) ? (sat1c / sat0) : 1.0;
     vec2  C_agc = C_der * scl_c;
@@ -237,13 +237,13 @@ vec4 hook(){
     W_blk *= mix(1.0, 0.5, mcut);
     W_wht *= mix(1.0, 0.5, mcut);
 
-    float Y_toe = mix(Yc, pow(max(Yc,0.0), unclip_shadow_power), W_blk);
-    float Y_sh  = mix(Y_toe, 1.0 - pow(max(1.0 - Y_toe,0.0), unclip_highlight_power), W_wht);
+    float Y_toe = mix(Yc, pow(max(Yc,0.0), pfs_unclip_shadow_power), W_blk);
+    float Y_sh  = mix(Y_toe, 1.0 - pow(max(1.0 - Y_toe,0.0), pfs_unclip_highlight_power), W_wht);
     float Y3    = Y_sh;
 
     // Colored fill: local midtone hue direction (cheap estimate: use current C direction normalized)
     vec2 h_mid = (length(C_agc) > EPS) ? normalize(C_agc) : vec2(0.0);
-    vec2 C_fill= C_agc + unclip_eta_fill * W_blk * h_mid;
+    vec2 C_fill= C_agc + pfs_unclip_eta_fill * W_blk * h_mid;
 
     // Shadow chroma gate (fade below 0.08)
     float fade = 1.0 - sstep(0.0, 0.08, Y3);
@@ -256,7 +256,7 @@ vec4 hook(){
     C3 = mix(C_agc, C3, allow);
 
     // Mean-Y guard (tiny pull toward original)
-    Y3 = mix(Y3, Yc, clamp(meanY_guard_pct*2.0, 0.0, 1.0));
+    Y3 = mix(Y3, Yc, clamp(pfs_meanY_guard_pct*2.0, 0.0, 1.0));
 
     // Specular color preserve: limit sat change ≤10% at Y>0.9
     float ymask = sstep(0.90, 1.00, Yc);

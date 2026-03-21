@@ -1,26 +1,26 @@
 #version 450
 
-//!PARAM base_strength
+//!PARAM tbmap_base_strength
 //!TYPE float
 0.015
 
-//!PARAM acutance_gain
+//!PARAM tbmap_acutance_gain
 //!TYPE float
 4.0
 
-//!PARAM max_boost
+//!PARAM tbmap_max_boost
 //!TYPE float
 0.6
 
-//!PARAM max_cut
+//!PARAM tbmap_max_cut
 //!TYPE float
 0.3
 
-//!PARAM tone_low
+//!PARAM tbmap_tone_low
 //!TYPE float
 0.08
 
-//!PARAM tone_high
+//!PARAM tbmap_tone_high
 //!TYPE float
 0.90
 
@@ -90,7 +90,7 @@ vec4 hook() {
 
     float A = 0.15 * HF1 + 0.65 * HF2 + 0.20 * HF3;
 
-    float A_norm = clamp(A * acutance_gain, 0.0, 1.0);
+    float A_norm = clamp(A * tbmap_acutance_gain, 0.0, 1.0);
 
     // Neighborhood texture density (smoothed acutance)
     float T = 0.0;
@@ -105,7 +105,7 @@ vec4 hook() {
                     (0.15 * abs(luma_bt2020(fetch_rgb(uv + offs)) -
                                 luma_bt2020(fetch_rgb(uv + offs + vec2(px.x, 0.0)))) +
                      0.65 * HF2 +
-                     0.20 * HF3) * acutance_gain,
+                     0.20 * HF3) * tbmap_acutance_gain,
                     0.0, 1.0);
                 T += Ay * w;
                 w_sum += w;
@@ -115,16 +115,16 @@ vec4 hook() {
     }
 
     float texture_need = T - A_norm;
-    float max_cut_clamped = max_cut;
-    float max_boost_clamped = max_boost;
+    float max_cut_clamped = tbmap_max_cut;
+    float max_boost_clamped = tbmap_max_boost;
     texture_need = clamp(texture_need, -max_cut_clamped, max_boost_clamped);
 
     // Blue-noise based microtexture
     vec2 ip = HOOKED_pos * HOOKED_size.xy;
     float n = hash21(ip + vec2(17.13, 47.79)) * 2.0 - 1.0;
 
-    float tone = smoothstep(tone_low, tone_high, Y0);
-    float M = n * tone * texture_need * base_strength;
+    float tone = smoothstep(tbmap_tone_low, tbmap_tone_high, Y0);
+    float M = n * tone * texture_need * tbmap_base_strength;
 
     float Y_new = clamp(Y0 + M, 0.0, 1.0);
     float dY = Y_new - Y0;

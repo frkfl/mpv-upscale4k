@@ -1,32 +1,32 @@
-//!PARAM strength
+//!PARAM epr_strength
 //!TYPE float
 1.0
 
-//!PARAM edge_lo
+//!PARAM epr_edge_lo
 //!TYPE float
 0.06
 
-//!PARAM edge_hi
+//!PARAM epr_edge_hi
 //!TYPE float
 0.18
 
-//!PARAM phase_max
+//!PARAM epr_phase_max
 //!TYPE float
 0.6
 
-//!PARAM amp_norm
+//!PARAM epr_amp_norm
 //!TYPE float
 0.35
 
-//!PARAM tangential_smooth
+//!PARAM epr_tangential_smooth
 //!TYPE float
 0.45
 
-//!PARAM temporal_alpha
+//!PARAM epr_temporal_alpha
 //!TYPE float
 1.0
 
-//!PARAM skin_protect
+//!PARAM epr_skin_protect
 //!TYPE float
 0.5
 
@@ -210,14 +210,14 @@ vec4 hook() {
     vec2 uv = HOOKED_pos;
 
     // Parameters with safety caps
-    float Strength = clamp(strength, 0.0, STRENGTH_CAP);
-    float EdgeLo   = edge_lo;
-    float EdgeHi   = edge_hi;
-    float PhaseMax = clamp(phase_max, 0.0, PHASE_MAX_CAP);
-    float AmpNorm  = clamp(amp_norm, 0.0, AMP_NORM_CAP);
-    float TangSm   = clamp(tangential_smooth, 0.0, TANG_SMOOTH_CAP);
-    float TempA    = clamp(temporal_alpha, 0.0, 1.0);
-    float SkinProt = saturate(skin_protect);
+    float Strength = clamp(epr_strength, 0.0, STRENGTH_CAP);
+    float EdgeLo   = epr_edge_lo;
+    float EdgeHi   = epr_edge_hi;
+    float PhaseMax = clamp(epr_phase_max, 0.0, PHASE_MAX_CAP);
+    float AmpNorm  = clamp(epr_amp_norm, 0.0, AMP_NORM_CAP);
+    float TangSm   = clamp(epr_tangential_smooth, 0.0, TANG_SMOOTH_CAP);
+    float TempA    = clamp(epr_temporal_alpha, 0.0, 1.0);
+    float SkinProt = saturate(epr_skin_protect);
 
     // --- 1) Convert
     vec3 rgb_in = fetchRGB(HOOKED_tex, uv);

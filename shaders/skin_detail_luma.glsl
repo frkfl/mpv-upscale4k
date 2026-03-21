@@ -1,26 +1,26 @@
 #version 450
 
-//!PARAM strength
+//!PARAM sdl_strength
 //!TYPE float
 0.18
 
-//!PARAM skin_hue
+//!PARAM sdl_skin_hue
 //!TYPE float
 0.075
 
-//!PARAM skin_width
+//!PARAM sdl_skin_width
 //!TYPE float
 0.070
 
-//!PARAM skin_soft
+//!PARAM sdl_skin_soft
 //!TYPE float
 0.030
 
-//!PARAM freq
+//!PARAM sdl_freq
 //!TYPE float
 1.25
 
-//!PARAM anisotropy
+//!PARAM sdl_anisotropy
 //!TYPE float
 0.55
 
@@ -97,9 +97,9 @@ vec4 hook() {
 
     // Skin gate by hue (linear RGB)
     float h = safe_hue(c00);
-    float dh = abs(h - skin_hue);
+    float dh = abs(h - sdl_skin_hue);
     dh = min(dh, 1.0 - dh);
-    float w_skin = 1.0 - smoothstep(max(skin_width, 1e-4), max(skin_width + skin_soft, 1e-4), dh);
+    float w_skin = 1.0 - smoothstep(max(sdl_skin_width, 1e-4), max(sdl_skin_width + sdl_skin_soft, 1e-4), dh);
 
     // Detail gate: only add texture where the image is already fairly smooth (avoid adding on edges/ringing)
     vec3 c10  = HOOKED_tex(uv + vec2( px.x, 0.0)).rgb;
@@ -114,17 +114,17 @@ vec4 hook() {
     float w_flat = exp(-grad / 0.020); // ~1 in smooth areas, ~0 on edges
 
     // Anisotropic "strand" modulation (procedural, subtle)
-    vec2 dir = normalize(vec2(1.0, anisotropy));
-    float sphase = dot(p, dir) * (0.09 * freq);
+    vec2 dir = normalize(vec2(1.0, sdl_anisotropy));
+    float sphase = dot(p, dir) * (0.09 * sdl_freq);
     float strand = sin(sphase) * 0.5 + 0.5;
 
     // Micro texture (centered)
-    float mt = micro_tex(p * (0.85 * freq)) * 0.6 + (strand - 0.5) * 0.4;
+    float mt = micro_tex(p * (0.85 * sdl_freq)) * 0.6 + (strand - 0.5) * 0.4;
 
     // Apply on luma only
     vec3 ycc = rgb_to_ycbcr2020(c00);
 
-    float k = clamp(strength, 0.0, 1.0);
+    float k = clamp(sdl_strength, 0.0, 1.0);
     float amp = mix(0.0006, 0.0022, k); // linear luma amplitude
     float addY = mt * amp * w_skin * w_flat;
 

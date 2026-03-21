@@ -1,31 +1,31 @@
-//!PARAM black_level
+//!PARAM cela_black_level
 //!TYPE float
 0.062561
-//!PARAM white_level
+//!PARAM cela_white_level
 //!TYPE float
 0.918367
-//!PARAM log_strength
+//!PARAM cela_log_strength
 //!TYPE float
 12.0
-//!PARAM exponent_weight
+//!PARAM cela_exponent_weight
 //!TYPE float
 0.85
-//!PARAM adapt_floor
+//!PARAM cela_adapt_floor
 //!TYPE float
 0.68
-//!PARAM adapt_ceiling
+//!PARAM cela_adapt_ceiling
 //!TYPE float
 1.18
-//!PARAM adapt_pivot
+//!PARAM cela_adapt_pivot
 //!TYPE float
 0.18
-//!PARAM adapt_contrast
+//!PARAM cela_adapt_contrast
 //!TYPE float
 0.60
-//!PARAM chroma_preserve
+//!PARAM cela_chroma_preserve
 //!TYPE float
 0.15
-//!PARAM soft_knee
+//!PARAM cela_soft_knee
 //!TYPE float
 0.02
 
@@ -55,29 +55,29 @@ vec4 hook() {
     vec3 rgb = HOOKED_tex(HOOKED_pos).rgb;
 
     // Normalize limited range
-    float range = max(white_level - black_level, EPS);
-    vec3 norm = clamp((rgb - black_level) / range, 0.0, 1.0);
+    float range = max(cela_white_level - cela_black_level, EPS);
+    vec3 norm = clamp((rgb - cela_black_level) / range, 0.0, 1.0);
 
     // Luma and log-luma
     float luma = dot(norm, W2020);
-    float log_luma = map_log01(luma, max(log_strength, EPS));
+    float log_luma = map_log01(luma, max(cela_log_strength, EPS));
 
     // Luminance-driven exponent
-    float expo_lin = mix(adapt_floor, adapt_ceiling, log_luma);
-    float expo = mix(1.0, expo_lin, clamp(exponent_weight,0.0,1.0));
+    float expo_lin = mix(cela_adapt_floor, cela_adapt_ceiling, log_luma);
+    float expo = mix(1.0, expo_lin, clamp(cela_exponent_weight,0.0,1.0));
 
     // Exponent shaping
     vec3 shaped = pow(max(norm, vec3(EPS)), vec3(expo));
 
     // Adaptive gain around pivot
-    float pivot_log = map_log01(clamp(adapt_pivot,0.0,1.0), max(log_strength,EPS));
-    float gain = exp2((log_luma - pivot_log) * adapt_contrast);
+    float pivot_log = map_log01(clamp(cela_adapt_pivot,0.0,1.0), max(cela_log_strength,EPS));
+    float gain = exp2((log_luma - pivot_log) * cela_adapt_contrast);
 
     //--------------------------------------------------------------
     // *** FIX 1: prevent runaway gain from blowing out everything ***
     // Limit gain so that shaped_luma * gain stays inside soft-knee
     //--------------------------------------------------------------
-    gain = min(gain, 1.0 + soft_knee * 3.0);
+    gain = min(gain, 1.0 + cela_soft_knee * 3.0);
 
     // Luminance target WITHOUT clipping (soft knee later)
     float shaped_luma = max(dot(shaped, W2020), EPS);
@@ -86,7 +86,7 @@ vec4 hook() {
     //--------------------------------------------------------------
     // *** FIX 2: apply soft knee BEFORE scaling RGB ***
     //--------------------------------------------------------------
-    target_luma = soft_clip(vec3(target_luma), max(soft_knee,0.0)).r;
+    target_luma = soft_clip(vec3(target_luma), max(cela_soft_knee,0.0)).r;
 
     // Scale RGB by safe luminance ratio
     float lum_scale = target_luma / shaped_luma;
@@ -95,13 +95,13 @@ vec4 hook() {
     //--------------------------------------------------------------
     // *** FIX 3: prevent per-channel blowout before soft-knee ***
     //--------------------------------------------------------------
-    adapted = min(adapted, vec3(1.0 + soft_knee));
+    adapted = min(adapted, vec3(1.0 + cela_soft_knee));
 
     // Chromaticity preservation
-    adapted = mix(adapted, norm, clamp(chroma_preserve,0.0,1.0));
+    adapted = mix(adapted, norm, clamp(cela_chroma_preserve,0.0,1.0));
 
     // Final soft knee
-    vec3 out_rgb = soft_clip(adapted, max(soft_knee,0.0));
+    vec3 out_rgb = soft_clip(adapted, max(cela_soft_knee,0.0));
 
     return vec4(out_rgb, 1.0);
 }

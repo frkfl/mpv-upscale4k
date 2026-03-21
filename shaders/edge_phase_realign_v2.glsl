@@ -1,36 +1,36 @@
-//!PARAM strength
+//!PARAM eprv_strength
 //!TYPE float
 1.0
 
-//!PARAM edge_gain
+//!PARAM eprv_edge_gain
 //!TYPE float
 1.0
 
-//!PARAM edge_exp
+//!PARAM eprv_edge_exp
 //!TYPE float
 1.0
 
-//!PARAM phase_max
+//!PARAM eprv_phase_max
 //!TYPE float
 0.6
 
-//!PARAM amp_norm
+//!PARAM eprv_amp_norm
 //!TYPE float
 0.35
 
-//!PARAM tangential_smooth
+//!PARAM eprv_tangential_smooth
 //!TYPE float
 0.45
 
-//!PARAM temporal_alpha
+//!PARAM eprv_temporal_alpha
 //!TYPE float
 1.0
 
-//!PARAM global_gain
+//!PARAM eprv_global_gain
 //!TYPE float
 1.0
 
-//!PARAM skin_protect
+//!PARAM eprv_skin_protect
 //!TYPE float
 0.5
 
@@ -194,15 +194,15 @@ vec4 hook(){
     vec2 px = 1.0 / HOOKED_size.xy;
 
     // Clamp parameters to safety limits
-    float Strength   = clamp(strength,           0.0, LIMIT_STRENGTH);
-    float EdgeGain   = clamp(edge_gain,          0.0, LIMIT_EDGE_GAIN);
-    float EdgeExp    = clamp(edge_exp,           0.0, LIMIT_EDGE_EXP);
-    float PhaseMax   = clamp(phase_max,          0.0, LIMIT_PHASE_MAX);
-    float AmpNorm    = clamp(amp_norm,           0.0, LIMIT_AMP_NORM);
-    float TangSmooth = clamp(tangential_smooth,  0.0, LIMIT_TANGENTIAL);
-    float TempAlpha  = clamp(temporal_alpha,     0.0, LIMIT_TEMPORAL_ALPHA);
-    float GlobalGain = clamp(global_gain,        0.0, LIMIT_GLOBAL_GAIN);
-    float SkinProt   = saturate(skin_protect);
+    float Strength   = clamp(eprv_strength,           0.0, LIMIT_STRENGTH);
+    float EdgeGain   = clamp(eprv_edge_gain,          0.0, LIMIT_EDGE_GAIN);
+    float EdgeExp    = clamp(eprv_edge_exp,           0.0, LIMIT_EDGE_EXP);
+    float PhaseMax   = clamp(eprv_phase_max,          0.0, LIMIT_PHASE_MAX);
+    float AmpNorm    = clamp(eprv_amp_norm,           0.0, LIMIT_AMP_NORM);
+    float TangSmooth = clamp(eprv_tangential_smooth,  0.0, LIMIT_TANGENTIAL);
+    float TempAlpha  = clamp(eprv_temporal_alpha,     0.0, LIMIT_TEMPORAL_ALPHA);
+    float GlobalGain = clamp(eprv_global_gain,        0.0, LIMIT_GLOBAL_GAIN);
+    float SkinProt   = saturate(eprv_skin_protect);
 
     // Original input
     vec3 rgb_in  = fetchRGB(HOOKED_tex, uv);

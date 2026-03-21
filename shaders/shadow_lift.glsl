@@ -1,28 +1,28 @@
-//!PARAM pivot
+//!PARAM sl_pivot
 //!TYPE float
 0.3
 
-//!PARAM strength
+//!PARAM sl_strength
 //!TYPE float
 1.00
 
-//!PARAM dark_lo
+//!PARAM sl_dark_lo
 //!TYPE float
 0.05
 
-//!PARAM dark_hi
+//!PARAM sl_dark_hi
 //!TYPE float
 0.1
 
-//!PARAM flat_lo
+//!PARAM sl_flat_lo
 //!TYPE float
 0.00
 
-//!PARAM flat_hi
+//!PARAM sl_flat_hi
 //!TYPE float
 0.07
 
-//!PARAM debug_mode
+//!PARAM sl_debug_mode
 //!TYPE float
 0.0
 
@@ -65,11 +65,11 @@ vec4 hook()
     // --- 2. Shadow mask: dark + flat ---
 
     // Darkness based on local mean
-    float dark_mask = 1.0 - smoothstep(dark_lo, dark_hi, Y_mean);
+    float dark_mask = 1.0 - smoothstep(sl_dark_lo, sl_dark_hi, Y_mean);
 
     // Flatness based on |Y - mean|
     float dY = abs(Y - Y_mean);
-    float flat_mask = 1.0 - smoothstep(flat_lo, flat_hi, dY);
+    float flat_mask = 1.0 - smoothstep(sl_flat_lo, sl_flat_hi, dY);
 
     float shadow_mask = clamp(dark_mask * flat_mask, 0.0, 1.0);
 
@@ -78,8 +78,8 @@ vec4 hook()
     float Y_target = Y;
 
     if (shadow_mask > 0.0 && Y > EPS) {
-        float w = clamp(strength * shadow_mask, 0.0, 1.0);
-        Y_target = mix(Y, pivot, w);      // pull toward pivot
+        float w = clamp(sl_strength * shadow_mask, 0.0, 1.0);
+        Y_target = mix(Y, sl_pivot, w);      // pull toward pivot
         Y_target = clamp(Y_target, 0.0, 1.0);
     }
 
@@ -89,7 +89,7 @@ vec4 hook()
 
     // --- 4. Debug: bright green where pixel changed ---
 
-    if (debug_mode > 0.5) {
+    if (sl_debug_mode > 0.5) {
         bool changed = any(greaterThan(abs(outc - c), vec3(1e-4)));
         if (changed) {
             return vec4(0.0, 1.0, 0.0, 1.0);

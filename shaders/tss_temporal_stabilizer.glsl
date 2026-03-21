@@ -1,29 +1,29 @@
 #version 450
-//!PARAM alpha
+//!PARAM tss_alpha
 //!TYPE float
 0.8
 
-//!PARAM delta_max
+//!PARAM tss_delta_max
 //!TYPE float
 0.08
 
-//!PARAM delta_exp
+//!PARAM tss_delta_exp
 //!TYPE float
 2.0
 
-//!PARAM var_sensitivity
+//!PARAM tss_var_sensitivity
 //!TYPE float
 0.6
 
-//!PARAM blur_sigma
+//!PARAM tss_blur_sigma
 //!TYPE float
 0.8
 
-//!PARAM chroma_alpha
+//!PARAM tss_chroma_alpha
 //!TYPE float
 0.4
 
-//!PARAM debug_mode
+//!PARAM tss_debug_mode
 //!TYPE float
 0.0
 
@@ -129,8 +129,8 @@ vec4 hook(){
     vec3 Delta = delta_smooth;
 
     // --- Weight computation: w = clamp(1 - (Δ/delta_max)^delta_exp, 0..1)
-    float dmax = max(delta_max, 1e-6);
-    float dexp = max(delta_exp, 1.0);
+    float dmax = max(tss_delta_max, 1e-6);
+    float dexp = max(tss_delta_exp, 1.0);
     vec3 w = vec3(1.0) - pow(clamp(Delta / dmax, vec3(0.0), vec3(1e6)), vec3(dexp));
     w = clamp01(w);
 
@@ -146,10 +146,10 @@ vec4 hook(){
     v /= 9.0;
     // Normalize variance to [0,1]
     float v_norm = v / (v + 0.01);
-    float g = mix(1.0, v_norm, saturate(var_sensitivity)); // lower variance -> closer to 1.0
+    float g = mix(1.0, v_norm, saturate(tss_var_sensitivity)); // lower variance -> closer to 1.0
 
     // --- Temporal fusion: stabilized = mix(curr, prev, alpha * w * g)
-    float a = alpha;
+    float a = tss_alpha;
     vec3 blendF = clamp(vec3(a * g) * w, vec3(0.0), vec3(1.0));
     vec3 stabilized = mix(curr, prev, blendF); // per-channel blend
 
@@ -161,7 +161,7 @@ vec4 hook(){
     float grad_norm = grad_mag / (grad_mag + 0.001);
     float edge_keep = 1.0 - grad_norm; // stronger blur where edges are weak
 
-    float sigma = clamp(blur_sigma, 0.0, 2.0);
+    float sigma = clamp(tss_blur_sigma, 0.0, 2.0);
     vec3 blurred = (sigma > 0.0) ? gaussian5x5(uv, px, HOOKED_tex, sigma) : stabilized;
     // Blend in RGB domain with edge-aware factor
     float sblend = saturate( (sigma * 0.5) * edge_keep );
@@ -170,7 +170,7 @@ vec4 hook(){
     // --- Final chroma-luma re-merge: extra chroma temporal smoothing
     vec3 ycc_stab = RGB_to_YCbCr(stabilized);
     vec3 ycc_prev = RGB_to_YCbCr(prev);
-    float ca = saturate(chroma_alpha);
+    float ca = saturate(tss_chroma_alpha);
     ycc_stab.y = mix(ycc_stab.y, ycc_prev.y, ca);
     ycc_stab.z = mix(ycc_stab.z, ycc_prev.z, ca);
     vec3 out_rgb = YCbCr_to_RGB(ycc_stab);
@@ -179,7 +179,7 @@ vec4 hook(){
     vec3 out_fin = clamp01(0.5 + 0.5 * tanh(2.0 * (out_rgb - 0.5)));
 
     // Debug overlay: visualize temporal weights as grayscale (higher=w→more blend)
-    if (debug_mode > 0.5){
+    if (tss_debug_mode > 0.5){
         float wl = dot(w, vec3(0.299, 0.587, 0.114)); // weight luminance
         return vec4(vec3(wl), 1.0);
     }

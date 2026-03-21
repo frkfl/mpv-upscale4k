@@ -1,28 +1,28 @@
-//!PARAM strength
+//!PARAM rg_strength
 //!TYPE float
 1.25
-//!PARAM radius
+//!PARAM rg_radius
 //!TYPE float
 1.5
-//!PARAM gamma_in
+//!PARAM rg_gamma_in
 //!TYPE float
 1.0
-//!PARAM gamma_out
+//!PARAM rg_gamma_out
 //!TYPE float
 1.0
-//!PARAM lobe_strength
+//!PARAM rg_lobe_strength
 //!TYPE float
 0.65
-//!PARAM lobe_threshold
+//!PARAM rg_lobe_threshold
 //!TYPE float
 0.015
-//!PARAM lobe_priority
+//!PARAM rg_lobe_priority
 //!TYPE float
 0.65
-//!PARAM delta_cap
+//!PARAM rg_delta_cap
 //!TYPE float
 0.50
-//!PARAM apply_threshold
+//!PARAM rg_apply_threshold
 //!TYPE float
 0.02
 
@@ -38,7 +38,7 @@ vec4 hook() {
     vec2 px = 1.0 / vec2(ts);
 
     // Work in linear light
-    vec3 src = pow(HOOKED_tex(uv).rgb, vec3(gamma_in));
+    vec3 src = pow(HOOKED_tex(uv).rgb, vec3(rg_gamma_in));
     float lc  = luma(src);
 
     // ---------------------------------------------------------------------
@@ -46,9 +46,9 @@ vec4 hook() {
     // ---------------------------------------------------------------------
     float minL = 1.0, maxL = 0.0, sumL = 0.0;
     int cnt = 0;
-    for (float y = -radius; y <= radius; y++) {
-        for (float x = -radius; x <= radius; x++) {
-            vec3 s = pow(HOOKED_tex(uv + vec2(x, y) * px).rgb, vec3(gamma_in));
+    for (float y = -rg_radius; y <= rg_radius; y++) {
+        for (float x = -rg_radius; x <= rg_radius; x++) {
+            vec3 s = pow(HOOKED_tex(uv + vec2(x, y) * px).rgb, vec3(rg_gamma_in));
             float l = luma(s);
             minL = min(minL, l);
             maxL = max(maxL, l);
@@ -62,11 +62,11 @@ vec4 hook() {
     // ---------------------------------------------------------------------
     // Box limiter proposal
     // ---------------------------------------------------------------------
-    float low   = mix(lc, minL, strength);
-    float high  = mix(lc, maxL, strength);
+    float low   = mix(lc, minL, rg_strength);
+    float high  = mix(lc, maxL, rg_strength);
     float p1    = clamp(lc, low, high);
 
-    float d1 = clamp(p1 - lc, -delta_cap * rangeL, delta_cap * rangeL);
+    float d1 = clamp(p1 - lc, -rg_delta_cap * rangeL, rg_delta_cap * rangeL);
     p1 = lc + d1;
 
     float outside = max(max(lc - maxL, 0.0), max(minL - lc, 0.0));
@@ -91,19 +91,19 @@ vec4 hook() {
     float phase = sign(lap) * sign(lc - meanL);
     float phase_gate = step(0.0, -phase); // activate if out-of-phase
 
-    float c2 = smoothstep(lobe_threshold, lobe_threshold * 4.0, dev_norm)
+    float c2 = smoothstep(rg_lobe_threshold, rg_lobe_threshold * 4.0, dev_norm)
              * (1.0 - smoothstep(0.05, 0.25, grad))
              * phase_gate;
 
-    float p2_raw = lc - lobe_strength * lap * 0.25;
-    float d2 = clamp(p2_raw - lc, -delta_cap * rangeL, delta_cap * rangeL);
+    float p2_raw = lc - rg_lobe_strength * lap * 0.25;
+    float d2 = clamp(p2_raw - lc, -rg_delta_cap * rangeL, rg_delta_cap * rangeL);
     float p2 = lc + d2;
 
     // ---------------------------------------------------------------------
     // Weighted blend (box + lobe) with priority
     // ---------------------------------------------------------------------
-    float w1 = c1 * (1.0 - lobe_priority);
-    float w2 = c2 * (0.5 + 0.5 * lobe_priority);
+    float w1 = c1 * (1.0 - rg_lobe_priority);
+    float w2 = c2 * (0.5 + 0.5 * rg_lobe_priority);
     float ws = w1 + w2;
 
     float target = lc;
@@ -116,13 +116,13 @@ vec4 hook() {
     // ---------------------------------------------------------------------
     // Apply only if significant change
     // ---------------------------------------------------------------------
-    float apply = step(apply_threshold * rangeL, abs(target - lc));
+    float apply = step(rg_apply_threshold * rangeL, abs(target - lc));
     float newL  = mix(lc, target, apply);
 
     newL = clamp(newL, 1e-5, 1.05);
 
     float scale = newL / max(lc, 1e-5);
-    vec3 outRGB = pow(clamp(src * scale, 0.0, 1.2), vec3(1.0 / gamma_out));
+    vec3 outRGB = pow(clamp(src * scale, 0.0, 1.2), vec3(1.0 / rg_gamma_out));
 
     return vec4(clamp(outRGB, 0.0, 1.0), 1.0);
 }

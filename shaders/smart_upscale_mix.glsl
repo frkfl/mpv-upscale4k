@@ -1,40 +1,40 @@
-//!PARAM strength
+//!PARAM sum_strength
 //!TYPE float
 1.25
 
-//!PARAM radius
+//!PARAM sum_radius
 //!TYPE float
 1.5
 
-//!PARAM gamma_in
+//!PARAM sum_gamma_in
 //!TYPE float
 1.0
 
-//!PARAM gamma_out
+//!PARAM sum_gamma_out
 //!TYPE float
 1.0
 
-//!PARAM lobe_strength
+//!PARAM sum_lobe_strength
 //!TYPE float
 0.65
 
-//!PARAM lobe_threshold
+//!PARAM sum_lobe_threshold
 //!TYPE float
 0.015
 
-//!PARAM lobe_priority
+//!PARAM sum_lobe_priority
 //!TYPE float
 0.65
 
-//!PARAM delta_cap
+//!PARAM sum_delta_cap
 //!TYPE float
 0.50
 
-//!PARAM apply_threshold
+//!PARAM sum_apply_threshold
 //!TYPE float
 0.02
 
-//!PARAM noise_strength
+//!PARAM sum_noise_strength
 //!TYPE float
 0.003
 
@@ -61,7 +61,7 @@ vec4 hook() {
     float noise_phase = hash12(vec2(t * 0.013, t * 0.007));
 
     // --- Load source and linearize ---
-    vec3 src = pow(HOOKED_tex(uv).rgb, vec3(gamma_in));
+    vec3 src = pow(HOOKED_tex(uv).rgb, vec3(sum_gamma_in));
     float lc = luma(src);
 
     // --- Adaptive noise amplitude: fade in midtones only ---
@@ -69,7 +69,7 @@ vec4 hook() {
 
     // --- Pre-mix decorrelating noise ---
     float n_pre = (hash12(uv * vec2(ts) + noise_phase * 17.17) - 0.5) * 2.0;
-    float noise_pre = n_pre * noise_strength * adapt;
+    float noise_pre = n_pre * sum_noise_strength * adapt;
     lc += noise_pre;
 
     // ---------------------------------------------------------------------
@@ -77,11 +77,11 @@ vec4 hook() {
     // ---------------------------------------------------------------------
     float minL = 1.0, maxL = 0.0, sumL = 0.0;
     int cnt = 0;
-    for (float y = -radius; y <= radius; y++) {
-        for (float x = -radius; x <= radius; x++) {
+    for (float y = -sum_radius; y <= sum_radius; y++) {
+        for (float x = -sum_radius; x <= sum_radius; x++) {
             vec2 offs = vec2(x, y) * px;
-            vec3 s = pow(HOOKED_tex(uv + offs).rgb, vec3(gamma_in));
-            float l = luma(s) + (hash12(uv + offs * 13.1) - 0.5) * noise_strength * 0.5;
+            vec3 s = pow(HOOKED_tex(uv + offs).rgb, vec3(sum_gamma_in));
+            float l = luma(s) + (hash12(uv + offs * 13.1) - 0.5) * sum_noise_strength * 0.5;
             minL = min(minL, l);
             maxL = max(maxL, l);
             sumL += l;
@@ -94,11 +94,11 @@ vec4 hook() {
     // ---------------------------------------------------------------------
     // Box limiter
     // ---------------------------------------------------------------------
-    float low   = mix(lc, minL, strength);
-    float high  = mix(lc, maxL, strength);
+    float low   = mix(lc, minL, sum_strength);
+    float high  = mix(lc, maxL, sum_strength);
     float p1    = clamp(lc, low, high);
 
-    float d1 = clamp(p1 - lc, -delta_cap * rangeL, delta_cap * rangeL);
+    float d1 = clamp(p1 - lc, -sum_delta_cap * rangeL, sum_delta_cap * rangeL);
     p1 = lc + d1;
 
     float outside = max(max(lc - maxL, 0.0), max(minL - lc, 0.0));
@@ -121,19 +121,19 @@ vec4 hook() {
     float phase_rel = sign(lap) * sign(lc - meanL);
     float phase_gate = step(0.0, -phase_rel);
 
-    float c2 = smoothstep(lobe_threshold, lobe_threshold * 4.0, dev_norm)
+    float c2 = smoothstep(sum_lobe_threshold, sum_lobe_threshold * 4.0, dev_norm)
              * (1.0 - smoothstep(0.05, 0.25, grad))
              * phase_gate;
 
-    float p2_raw = lc - lobe_strength * lap * 0.25;
-    float d2 = clamp(p2_raw - lc, -delta_cap * rangeL, delta_cap * rangeL);
+    float p2_raw = lc - sum_lobe_strength * lap * 0.25;
+    float d2 = clamp(p2_raw - lc, -sum_delta_cap * rangeL, sum_delta_cap * rangeL);
     float p2 = lc + d2;
 
     // ---------------------------------------------------------------------
     // Weighted blend (box + lobe)
     // ---------------------------------------------------------------------
-    float w1 = c1 * (1.0 - lobe_priority);
-    float w2 = c2 * (0.5 + 0.5 * lobe_priority);
+    float w1 = c1 * (1.0 - sum_lobe_priority);
+    float w2 = c2 * (0.5 + 0.5 * sum_lobe_priority);
     float ws = w1 + w2;
 
     float target = lc;
@@ -146,7 +146,7 @@ vec4 hook() {
     // ---------------------------------------------------------------------
     // Apply and clamp
     // ---------------------------------------------------------------------
-    float apply = step(apply_threshold * rangeL, abs(target - lc));
+    float apply = step(sum_apply_threshold * rangeL, abs(target - lc));
     float newL  = mix(lc, target, apply);
     newL = clamp(newL, 1e-5, 1.05);
 
@@ -154,10 +154,10 @@ vec4 hook() {
     // Recombine and add post-mix adaptive noise
     // ---------------------------------------------------------------------
     float scale = newL / max(lc, 1e-5);
-    vec3 outRGB = pow(clamp(src * scale, 0.0, 1.2), vec3(1.0 / gamma_out));
+    vec3 outRGB = pow(clamp(src * scale, 0.0, 1.2), vec3(1.0 / sum_gamma_out));
 
     vec3 n3 = vec3(hash12(uv * vec2(231.1, 91.7) + noise_phase) - 0.5);
-    float n_post_amp = noise_strength * 1.5 * adapt;
+    float n_post_amp = sum_noise_strength * 1.5 * adapt;
     outRGB += n3 * n_post_amp;
 
     return vec4(clamp(outRGB, 0.0, 1.0), 1.0);

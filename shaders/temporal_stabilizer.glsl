@@ -1,25 +1,25 @@
-//!PARAM gx_thresh
+//!PARAM ts_gx_thresh
 //!TYPE float
 0.05
-//!PARAM gy_thresh
+//!PARAM ts_gy_thresh
 //!TYPE float
 0.20
-//!PARAM alpha_base
+//!PARAM ts_alpha_base
 //!TYPE float
 0.25
-//!PARAM luma_gate_lo
+//!PARAM ts_luma_gate_lo
 //!TYPE float
 0.05
-//!PARAM luma_gate_hi
+//!PARAM ts_luma_gate_hi
 //!TYPE float
 0.90
-//!PARAM luma_gate_strength
+//!PARAM ts_luma_gate_strength
 //!TYPE float
 0.00
-//!PARAM phase_offset_px
+//!PARAM ts_phase_offset_px
 //!TYPE float
 0.0
-//!PARAM blur_sigma
+//!PARAM ts_blur_sigma
 //!TYPE float
 0.0
 
@@ -65,8 +65,8 @@ vec4 hook() {
 
     // Optional small separable blur to confine to mid-band (sub-band limit)
     float Yt = Y_now;
-    if (blur_sigma > 0.0) {
-        vec3 w = gauss3(blur_sigma);
+    if (ts_blur_sigma > 0.0) {
+        vec3 w = gauss3(ts_blur_sigma);
         float Yx = w.x * dot(linearize(HOOKED_tex(HOOKED_pos + vec2(-HOOKED_pt.x, 0.0))).rgb, W709)
                  + w.y * Yt
                  + w.z * dot(linearize(HOOKED_tex(HOOKED_pos + vec2(+HOOKED_pt.x, 0.0))).rgb, W709);
@@ -77,7 +77,7 @@ vec4 hook() {
     }
 
     // Previous frame luma (self for frame 0)
-    float Yt_1 = (frame == 0) ? Yt : prev_luma(ipix, phase_offset_px);
+    float Yt_1 = (frame == 0) ? Yt : prev_luma(ipix, ts_phase_offset_px);
 
     // (1) Luma difference map
     float dy = abs(Yt - Yt_1);
@@ -85,7 +85,7 @@ vec4 hook() {
     // (2) Edge gate: horizontal detail (gx) but not vertical edge (gy)
     float gx = abs(dFdx(Y_now));
     float gy = abs(dFdy(Y_now));
-    float candidate = (gy < gy_thresh && gx > gx_thresh) ? 1.0 : 0.0;
+    float candidate = (gy < ts_gy_thresh && gx > ts_gx_thresh) ? 1.0 : 0.0;
 
     // (3) Temporal coherence: running average of |dy| over ~3 frames (IIR α=1/3)
     float dy_avg_prev = (frame == 0) ? 0.0 : imageLoad(PREV2, ipix).r;
@@ -93,12 +93,12 @@ vec4 hook() {
     float stable      = smoothstep(0.02, 0.06, abs(dy_avg - dy));
 
     // Adaptive EMA weight
-    float alpha = alpha_base * stable * candidate;
+    float alpha = ts_alpha_base * stable * candidate;
 
     // Optional luma-weighted gating (preserve bright edges)
-    if (luma_gate_strength > 0.0) {
-        float w = smoothstep(luma_gate_lo, luma_gate_hi, clamp(Yt, 0.0, 1.0));
-        alpha  *= mix(1.0, w, clamp(luma_gate_strength, 0.0, 1.0));
+    if (ts_luma_gate_strength > 0.0) {
+        float w = smoothstep(ts_luma_gate_lo, ts_luma_gate_hi, clamp(Yt, 0.0, 1.0));
+        alpha  *= mix(1.0, w, clamp(ts_luma_gate_strength, 0.0, 1.0));
     }
     alpha = clamp(alpha, 0.0, 1.0);
 

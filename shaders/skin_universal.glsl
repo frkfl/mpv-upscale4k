@@ -1,34 +1,34 @@
-//!PARAM target
+//!PARAM su_target
 //!TYPE int
 //!MINIMUM 0
 //!MAXIMUM 6
 0
 
-//!PARAM strength
+//!PARAM su_strength
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 1.5
 0.8
 
-//!PARAM diffuse_adj
+//!PARAM su_diffuse_adj
 //!TYPE float
 //!MINIMUM 0.5
 //!MAXIMUM 1.5
 1.0
 
-//!PARAM specular_adj
+//!PARAM su_specular_adj
 //!TYPE float
 //!MINIMUM 0.5
 //!MAXIMUM 1.5
 1.0
 
-//!PARAM undertone_adj
+//!PARAM su_undertone_adj
 //!TYPE float
 //!MINIMUM 0.5
 //!MAXIMUM 1.5
 1.0
 
-//!PARAM reflectance_adj
+//!PARAM su_reflectance_adj
 //!TYPE float
 //!MINIMUM 0.5
 //!MAXIMUM 1.5
@@ -89,40 +89,40 @@ vec4 hook() {
     float diff_base=0.3, spec_base=0.3, tone_base=0.3, refl_base=0.3;
     float hue=38.0, shift=0.0, lift=0.0, gain=1.0;
 
-    if (target==0){ // Porcelain / Fair-Neutral
+    if (su_target==0){ // Porcelain / Fair-Neutral
         diff_base=0.45; spec_base=0.25; tone_base=0.25; refl_base=0.35;
         hue=30.0; shift=0.02; lift=0.02; gain=1.03;
-    } else if (target==1){ // Light-Warm (Golden/Peach)
+    } else if (su_target==1){ // Light-Warm (Golden/Peach)
         diff_base=0.35; spec_base=0.35; tone_base=0.35; refl_base=0.35;
         hue=38.0; shift=0.03; lift=0.02; gain=1.05;
-    } else if (target==2){ // Olive / Mediterranean
+    } else if (su_target==2){ // Olive / Mediterranean
         diff_base=0.30; spec_base=0.30; tone_base=0.40; refl_base=0.30;
         hue=42.0; shift=-0.02; lift=0.03; gain=1.04;
-    } else if (target==3){ // Tan / Light Brown
+    } else if (su_target==3){ // Tan / Light Brown
         diff_base=0.25; spec_base=0.35; tone_base=0.30; refl_base=0.40;
         hue=40.0; shift=0.00; lift=0.03; gain=1.08;
-    } else if (target==4){ // Brown-Warm (Caramel / Bronze)
+    } else if (su_target==4){ // Brown-Warm (Caramel / Bronze)
         diff_base=0.25; spec_base=0.30; tone_base=0.30; refl_base=0.45;
         hue=40.0; shift=0.02; lift=0.04; gain=1.06;
-    } else if (target==5){ // Deep Brown / Ebony (Cool)
+    } else if (su_target==5){ // Deep Brown / Ebony (Cool)
         diff_base=0.25; spec_base=0.25; tone_base=0.25; refl_base=0.50;
         hue=42.0; shift=-0.02; lift=0.05; gain=1.04;
-    } else if (target==6){ // Deep Warm (Mahogany)
+    } else if (su_target==6){ // Deep Warm (Mahogany)
         diff_base=0.25; spec_base=0.25; tone_base=0.35; refl_base=0.45;
         hue=36.0; shift=0.03; lift=0.04; gain=1.02;
     }
 
     // Apply user adjustments
-    float diff = diff_base * diffuse_adj;
-    float spec = spec_base * specular_adj;
-    float tone = tone_base * undertone_adj;
-    float refl = refl_base * reflectance_adj;
+    float diff = diff_base * su_diffuse_adj;
+    float spec = spec_base * su_specular_adj;
+    float tone = tone_base * su_undertone_adj;
+    float refl = refl_base * su_reflectance_adj;
 
     // Apply passes in perceptual order
-    vec3 d = diffuse_pass(rgb, diff * strength);
-    vec3 s = specular_pass(d, spec * strength);
-    vec3 u = undertone_pass(s, hue, shift, tone * strength);
-    vec3 f = reflectance_pass(u, lift, gain, refl * strength);
+    vec3 d = diffuse_pass(rgb, diff * su_strength);
+    vec3 s = specular_pass(d, spec * su_strength);
+    vec3 u = undertone_pass(s, hue, shift, tone * su_strength);
+    vec3 f = reflectance_pass(u, lift, gain, refl * su_strength);
 
     return vec4(clamp(f, 0.0, 1.0), 1.0);
 }

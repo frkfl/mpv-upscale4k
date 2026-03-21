@@ -1,16 +1,16 @@
-//!PARAM contrast
+//!PARAM sdcf_contrast
 //!TYPE float
 //!MINIMUM 0.5
 //!MAXIMUM 2.0
 1.30
 
-//!PARAM saturation
+//!PARAM sdcf_saturation
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 2.0
 1.10
 
-//!PARAM gamma
+//!PARAM sdcf_gamma
 //!TYPE float
 //!MINIMUM 0.1
 //!MAXIMUM 3.0
@@ -44,9 +44,9 @@ vec4 hook() {
     color = to_bt601(color);
 
     // Apply pipeline: contrast → saturation → gamma
-    color = adjust_contrast(color, contrast);
-    color = adjust_saturation(color, saturation);
-    color = adjust_gamma(color, gamma);
+    color = adjust_contrast(color, sdcf_contrast);
+    color = adjust_saturation(color, sdcf_saturation);
+    color = adjust_gamma(color, sdcf_gamma);
 
     return vec4(clamp(color, 0.0, 1.0), 1.0);
 }

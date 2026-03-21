@@ -1,44 +1,44 @@
-//!PARAM strength
+//!PARAM fri_strength
 //!TYPE float
 0.75
 
-//!PARAM black_protect
+//!PARAM fri_black_protect
 //!TYPE float
 0.015
 
-//!PARAM pivot
+//!PARAM fri_pivot
 //!TYPE float
 0.45
 
-//!PARAM gamma_low
+//!PARAM fri_gamma_low
 //!TYPE float
 0.80
 
-//!PARAM gamma_high
+//!PARAM fri_gamma_high
 //!TYPE float
 1.10
 
-//!PARAM fade_start
+//!PARAM fri_fade_start
 //!TYPE float
 0.80
 
-//!PARAM soft_knee
+//!PARAM fri_soft_knee
 //!TYPE float
 0.02
 
-//!PARAM chroma_preserve
+//!PARAM fri_chroma_preserve
 //!TYPE float
 0.25
 
-//!PARAM luma_r
+//!PARAM fri_luma_r
 //!TYPE float
 0.2627
 
-//!PARAM luma_g
+//!PARAM fri_luma_g
 //!TYPE float
 0.6780
 
-//!PARAM luma_b
+//!PARAM fri_luma_b
 //!TYPE float
 0.0593
 
@@ -114,7 +114,7 @@ float s_curve_luma(float L,
 
 vec4 hook() {
     vec3 rgb  = HOOKED_tex(HOOKED_pos).rgb;
-    vec3 W    = vec3(luma_r, luma_g, luma_b);
+    vec3 W    = vec3(fri_luma_r, fri_luma_g, fri_luma_b);
 
     // Current luma in mpv/libplacebo's full-range working space
     float L_in = clamp(dot(rgb, W), 0.0, 1.0);
@@ -122,12 +122,12 @@ vec4 hook() {
     // Apply S-curve on luma only
     float L_out = s_curve_luma(
         L_in,
-        black_protect,
-        pivot,
-        gamma_low,
-        gamma_high,
-        fade_start,
-        strength
+        fri_black_protect,
+        fri_pivot,
+        fri_gamma_low,
+        fri_gamma_high,
+        fri_fade_start,
+        fri_strength
     );
 
     // If luma is ~0, keep black (avoid division noise)
@@ -140,10 +140,10 @@ vec4 hook() {
     vec3 rgb_toned = rgb * scale;
 
     // Very gentle highlight safety
-    rgb_toned = soft_clip(rgb_toned, soft_knee);
+    rgb_toned = soft_clip(rgb_toned, fri_soft_knee);
 
     // Optional chroma preservation: pull back toward original RGB
-    rgb_toned = mix(rgb_toned, rgb, clamp(chroma_preserve, 0.0, 1.0));
+    rgb_toned = mix(rgb_toned, rgb, clamp(fri_chroma_preserve, 0.0, 1.0));
 
     // Final clamp to displayable range
     rgb_toned = clamp(rgb_toned, 0.0, 1.0);

@@ -1,21 +1,21 @@
 #version 450
-//!PARAM sigma
+//!PARAM cd_sigma
 //!TYPE float
 0.5
 
-//!PARAM r_low
+//!PARAM cd_r_low
 //!TYPE float
 0.15
 
-//!PARAM r_high
+//!PARAM cd_r_high
 //!TYPE float
 0.45
 
-//!PARAM m_lo
+//!PARAM cd_m_lo
 //!TYPE float
 0.02
 
-//!PARAM m_hi
+//!PARAM cd_m_hi
 //!TYPE float
 0.25
 
@@ -71,7 +71,7 @@ vec4 hook() {
     vec3 rgb = HOOKED_tex(uv).rgb;
 
     // 2.1 Luma pre-smoothing
-    float Y_s = luma_smoothed(uv, texel, sigma);
+    float Y_s = luma_smoothed(uv, texel, cd_sigma);
 
     // Chroma (from original rgb, not blurred)
     float Y0 = luma709(rgb);
@@ -85,10 +85,10 @@ vec4 hook() {
     float Yy_m = luma709(HOOKED_tex(uv - vec2(0.0, texel.y)).rgb);
 
     // Use smoothed luma for gradient magnitude; approximate via mixed sampling
-    float Ys_x_p = luma_smoothed(uv + vec2(texel.x, 0.0), texel, sigma);
-    float Ys_x_m = luma_smoothed(uv - vec2(texel.x, 0.0), texel, sigma);
-    float Ys_y_p = luma_smoothed(uv + vec2(0.0, texel.y), texel, sigma);
-    float Ys_y_m = luma_smoothed(uv - vec2(0.0, texel.y), texel, sigma);
+    float Ys_x_p = luma_smoothed(uv + vec2(texel.x, 0.0), texel, cd_sigma);
+    float Ys_x_m = luma_smoothed(uv - vec2(texel.x, 0.0), texel, cd_sigma);
+    float Ys_y_p = luma_smoothed(uv + vec2(0.0, texel.y), texel, cd_sigma);
+    float Ys_y_m = luma_smoothed(uv - vec2(0.0, texel.y), texel, cd_sigma);
 
     vec2 gY = 0.5 * vec2(Ys_x_p - Ys_x_m, Ys_y_p - Ys_y_m);
     float m = length(gY);
@@ -126,10 +126,10 @@ vec4 hook() {
     c = clamp(c, 0.0, 1.0);
 
     // 3.4 Edge magnitude suppression s
-    float s = 1.0 - smoothstep(m_lo, m_hi, m);
+    float s = 1.0 - smoothstep(cd_m_lo, cd_m_hi, m);
 
     // 4. Clarity potential
-    float P = s * smoothstep(r_low, r_high, r_w) * c;
+    float P = s * smoothstep(cd_r_low, cd_r_high, r_w) * c;
     P = clamp(P, 0.0, 1.0);
 
     // 5. Output

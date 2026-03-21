@@ -1,10 +1,10 @@
 #version 450
 
-//!PARAM strength
+//!PARAM mdl_strength
 //!TYPE float
 0.28
 
-//!PARAM threshold
+//!PARAM mdl_threshold
 //!TYPE float
 0.004
 
@@ -64,16 +64,16 @@ vec4 hook() {
     float highY = Y0 - Ym;
 
     // Edge/detail gate based on local contrast (not brightness)
-    float t = max(threshold, 0.0);
+    float t = max(mdl_threshold, 0.0);
     float soft = max(t * 1.75, 1e-6);
     float w = smoothstep(t, t + soft, abs(highY));
 
     // Apply only on luma to avoid hue shifts
     vec3 ycc = rgb_to_ycbcr2020(c00);
-    float k = strength * w;
+    float k = mdl_strength * w;
 
     // Mild limiter to avoid harsh ringing
-    float lim = mix(0.010, 0.030, clamp(strength, 0.0, 1.0));
+    float lim = mix(0.010, 0.030, clamp(mdl_strength, 0.0, 1.0));
     float deltaY = clamp(highY * k, -lim, lim);
 
     ycc.x = clamp(ycc.x + deltaY, 0.0, 1.0);
