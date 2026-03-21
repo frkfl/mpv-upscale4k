@@ -1,27 +1,12 @@
-//!PARAM nl_strength
-//!TYPE float
-//!MINIMUM 0.0
-//!MAXIMUM 1.0
-0.1
-
-//!HOOK LUMA
-//!HOOK CHROMA
-//!BIND HOOKED
-//!SAVE ORIG
-//!DESC [Custom] Save original before denoise
-vec4 hook() {
-    return HOOKED_tex(HOOKED_pos);
-}
-
 //!HOOK LUMA
 //!HOOK CHROMA
 //!BIND HOOKED
 //!DESC [Custom] Non-local means (nlmeans.glsl)
 //!SAVE G
 #ifdef LUMA_raw
-#define S 1.2
+#define S 3.8070155534513885
 #else
-#define S 1.0
+#define S 3.8391080491674847
 #endif
 #ifdef LUMA_raw
 #define AS 0
@@ -868,6 +853,11 @@ vec4 hook()
     return G_texOff(0);
 }
 
+//!PARAM nl_strength
+//!TYPE float
+//!MINIMUM 0.0
+//!MAXIMUM 1.0
+0.5
 //!HOOK LUMA
 //!HOOK CHROMA
 //!BIND HOOKED
@@ -1709,14 +1699,5 @@ vec4 hook()
 #else
     float ep_weight = 0;
 #endif
-    return unval(result);
-}
-
-//!HOOK LUMA
-//!HOOK CHROMA
-//!BIND HOOKED
-//!BIND ORIG
-//!DESC [Custom] Non-local means blend with original
-vec4 hook() {
-    return mix(ORIG_texOff(0), HOOKED_tex(HOOKED_pos), nl_strength);
+    return mix(HOOKED_tex(HOOKED_pos), unval(result), nl_strength);
 }
