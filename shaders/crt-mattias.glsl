@@ -164,8 +164,9 @@ vec4 hook()
 
     // Chromatic aberration — radial, zero at center, grows toward edges.
     // R pushed outward, B pushed inward — lateral lens aberration behaviour.
-    // ~3px at 480p corner, sub-pixel at 4K corner.
-    vec2 ca = (curved - 0.5) * 0.006 * cm_chroma;
+    // Scaled by HOOKED_pt so offset is in pixels, not UV fractions.
+    // cm_chroma=1 -> ~2px at corner regardless of output resolution.
+    vec2 ca = (curved - 0.5) * HOOKED_pt * 4.0 * cm_chroma;
     vec3 col;
     col.r = tsample(curved + ca).x;
     col.g = tsample(curved).y;

@@ -66,10 +66,18 @@ vec4 hook() {
     float transience_gate = smoothstep(tmb_transience_lo, tmb_transience_hi, transience);
     float blend           = motion_gate * transience_gate * tmb_strength;
 
-    // Apply blend to luma only, preserve chroma by proportional scaling
-    float Y_out   = mix(Y_cur, Y_prev, blend);
-    float scale   = Y_out / max(Y_cur, EPS);
-    vec3  rgb_out = clamp(cur * scale, 0.0, 1.0);
+    // Spatial blur of current frame, scaled by blend factor.
+    // Previous frame is used only as motion detector — its RGB never
+    // touches the output, so no ghosting or color fringing is possible.
+    // A 5-tap cross softens moving areas; wrong content but reads as blur.
+    vec2 pt = 1.0 / HOOKED_size;
+    vec3 spatial =
+        HOOKED_tex(HOOKED_pos).rgb * 0.40 +
+        HOOKED_tex(HOOKED_pos + vec2( pt.x, 0.0)).rgb * 0.15 +
+        HOOKED_tex(HOOKED_pos + vec2(-pt.x, 0.0)).rgb * 0.15 +
+        HOOKED_tex(HOOKED_pos + vec2(0.0,  pt.y)).rgb * 0.15 +
+        HOOKED_tex(HOOKED_pos + vec2(0.0, -pt.y)).rgb * 0.15;
+    vec3  rgb_out = clamp(mix(cur, spatial, blend), 0.0, 1.0);
 
     // Persist for next frame — own position only
     imageStore(PREV1, ipix, vec4(Y_cur,     0.0, 0.0, 1.0));
