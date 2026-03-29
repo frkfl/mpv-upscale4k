@@ -13,7 +13,6 @@
 //!HOOK MAIN
 //!BIND HOOKED
 //!DESC [Custom] Luma brightness
-//!SAVE MAIN
 
 // Reinhard Shoulder
 vec3 reinhard_exposure(vec3 c, float k, float shoulder) {

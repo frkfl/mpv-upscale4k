@@ -2,6 +2,7 @@
 -- Threshold: 800000 bps (0.8 Mbps).
 
 local threshold = 800000
+local max_retries = 20  -- 10 seconds max; raw captures have no bitrate, default to HQ
 
 local function apply_profile(bitrate)
     if bitrate >= threshold then
@@ -13,12 +14,20 @@ local function apply_profile(bitrate)
     end
 end
 
+local retry_count = 0
+
 local function check_bitrate()
     local bitrate = mp.get_property_number("video-bitrate")
     if bitrate and bitrate > 0 then
+        retry_count = 0
         apply_profile(bitrate)
+    elseif retry_count < max_retries then
+        retry_count = retry_count + 1
+        mp.add_timeout(0.5, check_bitrate)
     else
-        mp.add_timeout(0.5, check_bitrate)  -- Retry every 0.5s until available
+        retry_count = 0
+        mp.command("apply-profile 1080p_HQ")
+        mp.msg.info("Applied 1080p_HQ (no bitrate detected, raw/live source)")
     end
 end
 
@@ -27,6 +36,7 @@ function on_file_loaded()
     if width == nil or width < 1600 then
         return
     end
+    retry_count = 0
     mp.add_timeout(0.1, check_bitrate)  -- Start checking shortly after load
 end
 

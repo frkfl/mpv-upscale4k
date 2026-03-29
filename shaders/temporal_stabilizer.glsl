@@ -119,7 +119,7 @@ vec4 hook() {
     return vec4(out_nl, HOOKED_tex(HOOKED_pos).a);
 }
 
-// Persistent storage images (nlmeans style, declared at end)
+// Persistent storage images
 //!TEXTURE PREV1
 //!SIZE 3840 3840
 //!FORMAT r16f
