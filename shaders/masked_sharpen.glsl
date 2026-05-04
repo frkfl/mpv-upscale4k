@@ -22,21 +22,13 @@
 //!TYPE float
 0.5
 
-//!PARAM msh_gamma_in
-//!TYPE float
-1.0
-
-//!PARAM msh_gamma_out
-//!TYPE float
-1.0
-
 //!HOOK MAIN
 //!BIND HOOKED
 //!BIND PREV
 //!DESC [Custom] Masked anti-halo luma-only sharpen with motion gating
 
-// BT.709 luma weights
-const vec3 LUMA = vec3(0.299, 0.587, 0.114);
+// Input is linear BT.2020 (MAIN, gpu-next)
+const vec3 LUMA = vec3(0.2627, 0.6780, 0.0593);
 
 // Compute luma
 float luma(vec3 c) { return dot(c, LUMA); }

@@ -40,13 +40,13 @@
 //!BIND PREV2
 //!DESC [Custom] Temporal Motion Blur
 
-const vec3  W709 = vec3(0.2126, 0.7152, 0.0722);
+const vec3  W2020 = vec3(0.2627, 0.6780, 0.0593);
 const float EPS  = 1e-6;
 
 vec4 hook() {
     ivec2 ipix  = ivec2(floor(HOOKED_pos * HOOKED_size));
     vec3  cur   = HOOKED_tex(HOOKED_pos).rgb;
-    float Y_cur = dot(cur, W709);
+    float Y_cur = dot(cur, W2020);
 
     // Read previous frame luma and motion EMA — own position only, no hazard
     float Y_prev  = (frame == 0) ? Y_cur  : imageLoad(PREV1, ipix).r;

@@ -10,63 +10,49 @@
 //!TYPE float
 0.06
 
-//!PARAM cp_gamma_in
-//!TYPE float
-2.20
-
-//!PARAM cp_gamma_out
-//!TYPE float
-2.20
-
-//!HOOK POSTKERNEL
+//!HOOK MAIN
 //!BIND HOOKED
 //!DESC [Custom] Chroma Pop
 
-// sRGB <-> linear helpers
-vec3 toLin(vec3 c, float g) {
-    return pow(max(c, 0.0), vec3(g > 0.0 ? 1.0 / g : 1.0));
-}
-vec3 toGam(vec3 c, float g) {
-    return pow(max(c, 0.0), vec3(g > 0.0 ? g : 1.0));
-}
-
-// BT.709 RGB↔YUV matrices (linear domain)
-mat3 RGB2YUV = mat3(
-    0.2126,  0.7152,  0.0722,
-   -0.1146, -0.3854,  0.5000,
-    0.5000, -0.4542, -0.0458
+// BT.2020 RGB↔YCbCr matrices (linear domain, column-major)
+const mat3 RGB2YUV = mat3(
+     0.2627, -0.1396,  0.5000,  // column 0: R -> Y, Cb, Cr
+     0.6780, -0.3604, -0.4598,  // column 1: G -> Y, Cb, Cr
+     0.0593,  0.5000, -0.0402   // column 2: B -> Y, Cb, Cr
 );
-mat3 YUV2RGB = inverse(RGB2YUV);
+const mat3 YUV2RGB = mat3(
+    1.0,        1.0,       1.0,       // column 0
+    0.0,       -0.1645,    1.8814,    // column 1
+    1.4746,    -0.5714,    0.0        // column 2
+);
 
 vec4 hook() {
     vec2 uv = HOOKED_pos;
     vec2 px = 1.0 / HOOKED_size.xy;
     float r = cp_radius;
 
-    // Source to linear YUV
-    vec3 srgb = HOOKED_tex(uv).rgb;
-    vec3 lin  = toLin(srgb, cp_gamma_in);
-    vec3 yuv  = RGB2YUV * lin;
-    float Y   = yuv.x;
+    // Input is linear BT.2020 (MAIN, gpu-next)
+    vec3 lin = HOOKED_tex(uv).rgb;
+    vec3 yuv = RGB2YUV * lin;
+    float Y  = yuv.x;
 
     // 5-tap chroma blur (luma excluded)
     vec3 s = vec3(0.0);
-    s += RGB2YUV * toLin(HOOKED_tex(uv + vec2( 0.0,  0.0)).rgb, cp_gamma_in);
-    s += RGB2YUV * toLin(HOOKED_tex(uv + vec2( px.x * r, 0.0)).rgb, cp_gamma_in);
-    s += RGB2YUV * toLin(HOOKED_tex(uv + vec2(-px.x * r, 0.0)).rgb, cp_gamma_in);
-    s += RGB2YUV * toLin(HOOKED_tex(uv + vec2(0.0,  px.y * r)).rgb, cp_gamma_in);
-    s += RGB2YUV * toLin(HOOKED_tex(uv + vec2(0.0, -px.y * r)).rgb, cp_gamma_in);
+    s += RGB2YUV * HOOKED_tex(uv + vec2( 0.0,       0.0)).rgb;
+    s += RGB2YUV * HOOKED_tex(uv + vec2( px.x * r,  0.0)).rgb;
+    s += RGB2YUV * HOOKED_tex(uv + vec2(-px.x * r,  0.0)).rgb;
+    s += RGB2YUV * HOOKED_tex(uv + vec2( 0.0,  px.y * r)).rgb;
+    s += RGB2YUV * HOOKED_tex(uv + vec2( 0.0, -px.y * r)).rgb;
     s *= 0.2; // 1/5 average
 
     // Chroma contrast boost
-    vec2 UV  = yuv.yz;
-    vec2 UVb = s.yz;
+    vec2 UV   = yuv.yz;
+    vec2 UVb  = s.yz;
     vec2 diff = UV - UVb;
     vec2 add  = clamp(diff * cp_amount, -cp_clamp_c, cp_clamp_c);
 
-    vec3 yuv2 = vec3(Y, UV + add);
-    vec3 out_lin  = YUV2RGB * yuv2;
-    vec3 out_srgb = toGam(out_lin, cp_gamma_out);
+    vec3 yuv2    = vec3(Y, UV + add);
+    vec3 out_lin = YUV2RGB * yuv2;
 
-    return vec4(clamp(out_srgb, 0.0, 1.0), 1.0);
+    return vec4(max(out_lin, 0.0), 1.0);
 }
