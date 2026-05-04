@@ -96,7 +96,7 @@ vec4 hook()
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 1.0
-0.5
+0.25
 
 //!PARAM cm_noise
 //!TYPE float
@@ -109,6 +109,12 @@ vec4 hook()
 //!MINIMUM 0.0
 //!MAXIMUM 0.05
 0.01
+
+//!PARAM cm_brightness
+//!TYPE float
+//!MINIMUM 0.5
+//!MAXIMUM 2.0
+1.0
 
 //!HOOK MAIN
 //!BIND HOOKED
@@ -199,11 +205,27 @@ vec4 hook()
     // Gentle S-curve contrast in gamma space — color-neutral, no clipping.
     col = scurve(clamp(col, 0.0, 1.0), cm_contrast);
 
-    // Vignette — center = 1.0 (no boost), edges darken proportionally.
-    // Fixed: original formula boosted center to 1.36x, compounding the brightness
-    // issue when scanlines and shadow mask were removed.
-    float vig = pow(clamp(curved.x * curved.y * (1.0-curved.x) * (1.0-curved.y) * 16.0, 0.0, 1.0), 0.3);
+    // Vignette - flat center, steep drop only at far edges and corners.
+    // Real CRT perception: center and most of the frame were the same brightness.
+    // Darkening was rapid and exponential only in the outer 25-30% toward corners.
+    // The old formula (x*y*(1-x)*(1-y)) started darkening immediately from center
+    // and caused 10% average luminance loss across the whole frame.
+    //
+    // New formula: radial distance from center, normalized so corner = 1.0.
+    // Flat zone: no effect until r > 0.70 (covers full side centers and most edges).
+    // Beyond threshold: cubic drop, steep at corners, negligible at side midpoints.
+    //   side center (top/bottom/left/right midpoints): r = 0.707 -> t = 0.023 -> 0.2% loss
+    //   near corner:  r = 0.90  -> t = 0.67  -> ~12% loss at cm_vignette=0.5
+    //   true corner:  r = 1.00  -> t = 1.00  -> 50% loss  (outside content, not seen)
+    vec2 dv  = (curved - 0.5) * 2.0;
+    float r  = length(dv) * 0.7071;  // normalize: corner = 1.0, side center = 0.707
+    float vt  = clamp((r - 0.70) / 0.30, 0.0, 1.0);
+    float vig = 1.0 - pow(vt, 3.0);
     col *= mix(1.0, vig, cm_vignette);
+
+    // Global brightness compensation - applied after vignette so it recovers
+    // the average luminance loss without fighting the spatial shape of the vignette.
+    col *= cm_brightness;
 
     // Noise
     vec2 seed = curved * resolution;
