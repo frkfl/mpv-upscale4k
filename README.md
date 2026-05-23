@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://en.wikipedia.org/wiki/Mpv_(media_player)#/media/File:Mpv_logo_(official).png" alt="mpv logo" width="90" height="90"/>
+  <img src="https://commons.wikimedia.org/wiki/File:Mpv_logo_(official).png" alt="mpv logo" width="90" height="90"/>
 </p>
 
 <h1 align="center">🎞️ 4K Upscaler for all sources</h1>
