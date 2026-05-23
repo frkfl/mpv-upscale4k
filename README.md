@@ -2,11 +2,7 @@
   <img src="https://en.wikipedia.org/wiki/Mpv_(media_player)#/media/File:Mpv_logo_(official).png" alt="mpv logo" width="90" height="90"/>
 </p>
 
-<h1 align="center">🎞️ The best 4K possible for mpv, whatever the source</h1>
-
-<p align="center">
-  <em>Rebuilding lost analog beauty, lost digital crispness — not hallucinating digital sharpness.</em>
-</p>
+<h1 align="center">🎞️ 4K Upscaler for all sources</h1>
 
 <p align="center">
   <a href="https://mpv.io/"><img src="https://img.shields.io/badge/mpv-gpu--next-blueviolet?style=flat-square" alt="mpv gpu-next"/></a>
