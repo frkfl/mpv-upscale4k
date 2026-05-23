@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://commons.wikimedia.org/wiki/File:Mpv_logo_(official).png" alt="mpv logo" width="90" height="90"/>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/7/73/Mpv_logo_%28official%29.png?_=20161004103704" alt="mpv logo" width="90" height="90"/>
 </p>
 
 <h1 align="center">🎞️ 4K Upscaler for all sources</h1>
@@ -102,5 +102,7 @@ You may freely copy, modify, and redistribute — credit appreciated but not req
 ## 💡 Credits
 
 Shader math inspired by FSRCNNX, SSimSuperRes, and Björn Ottosson’s OkLab.
-Tone and color methodology co-developed with ChatGPT-5 experimental research assistance.
-Tested on RTX 3080 / mpv-gpu-next Vulkan backend, tuned for 24 fps cinematic sources.
+
+## Specs
+
+Tested on RTX 3080 / mpv-gpu-next Vulkan backend
