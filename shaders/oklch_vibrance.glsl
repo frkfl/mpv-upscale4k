@@ -1,10 +1,10 @@
 //!PARAM ov_vibrance
 //!TYPE float
-0.18
+0.15
 
 //!PARAM ov_skin_protect
 //!TYPE float
-0.60
+0.45
 
 //!PARAM ov_skin_hue
 //!TYPE float
@@ -12,11 +12,11 @@
 
 //!PARAM ov_skin_width
 //!TYPE float
-0.06
+0.08
 
 //!PARAM ov_mid_bias
 //!TYPE float
-0.20
+0.42
 
 //!PARAM ov_gamma_in
 //!TYPE float
@@ -28,7 +28,7 @@
 
 //!PARAM ov_chroma_tame
 //!TYPE float
-0.15
+0.10
 
 //!HOOK MAIN
 //!BIND HOOKED

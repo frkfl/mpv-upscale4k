@@ -2,25 +2,25 @@
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 2.0
-0.6
+1.0
 
 //!PARAM md_low
 //!TYPE float
 //!MINIMUM 0.0001
 //!MAXIMUM 0.02
-0.002
+0.001
 
 //!PARAM md_high
 //!TYPE float
 //!MINIMUM 0.001
 //!MAXIMUM 0.1
-0.02
+0.04
 
 //!PARAM md_radius
 //!TYPE float
 //!MINIMUM 0.1
 //!MAXIMUM 2.0
-0.75
+1.2
 
 //!HOOK MAIN
 //!BIND HOOKED

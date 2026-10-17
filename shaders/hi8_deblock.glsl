@@ -1,6 +1,6 @@
 //!PARAM hd_strength
 //!TYPE float
-0.7
+1.95
 
 //!PARAM hd_var_low
 //!TYPE float

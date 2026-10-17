@@ -2,7 +2,7 @@
 //!TYPE float
 //!MINIMUM -1000.0
 //!MAXIMUM 1000.0
-0.0
+10
 
 //!PARAM lb_shoulder
 //!TYPE float

@@ -1,12 +1,12 @@
 //!PARAM ts_gx_thresh
 //!TYPE float
-0.05
+0.04
 //!PARAM ts_gy_thresh
 //!TYPE float
-0.20
+0.25
 //!PARAM ts_alpha_base
 //!TYPE float
-0.25
+0.30
 //!PARAM ts_luma_gate_lo
 //!TYPE float
 0.05
@@ -15,18 +15,18 @@
 0.90
 //!PARAM ts_luma_gate_strength
 //!TYPE float
-0.00
+0.10
 //!PARAM ts_phase_offset_px
 //!TYPE float
 0.0
 //!PARAM ts_blur_sigma
 //!TYPE float
-0.0
+0.15
 
 //!HOOK MAIN
 //!BIND HOOKED
-//!BIND PREV1
-//!BIND PREV2
+//!BIND TS_PREV1
+//!BIND TS_PREV2
 //!DESC [Custom] Temporal Stabilizer (horizontal ringing)
 
 const float EPS = 1e-7;
@@ -45,10 +45,10 @@ float prev_luma(ivec2 ipix, float phase_px) {
     float fy = fract(phase_px);
     int   oy = int(floor(phase_px));
     ivec2 p0 = ipix + ivec2(0, oy);
-    vec4 s0 = imageLoad(PREV1, p0);   // r16f -> vec4
+    vec4 s0 = imageLoad(TS_PREV1, p0);   // r16f -> vec4
     if (fy == 0.0) return s0.r;
     ivec2 p1 = ipix + ivec2(0, oy + 1);
-    vec4 s1 = imageLoad(PREV1, p1);
+    vec4 s1 = imageLoad(TS_PREV1, p1);
     return mix(s0.r, s1.r, fy);
 }
 
@@ -88,7 +88,7 @@ vec4 hook() {
     float candidate = (gy < ts_gy_thresh && gx > ts_gx_thresh) ? 1.0 : 0.0;
 
     // (3) Temporal coherence: running average of |dy| over ~3 frames (IIR α=1/3)
-    float dy_avg_prev = (frame == 0) ? 0.0 : imageLoad(PREV2, ipix).r;
+    float dy_avg_prev = (frame == 0) ? 0.0 : imageLoad(TS_PREV2, ipix).r;
     float dy_avg      = mix(dy_avg_prev, dy, 0.33333334);
     float stable      = smoothstep(0.02, 0.06, abs(dy_avg - dy));
 
@@ -111,8 +111,8 @@ vec4 hook() {
     vec3  rgb_out = rgb * scale;
 
     // Persist states for next frame
-    imageStore(PREV1, ipix, vec4(Yt, 0.0, 0.0, 1.0));     // current (possibly mid-band) luma
-    imageStore(PREV2, ipix, vec4(dy_avg, 0.0, 0.0, 1.0)); // running |dy| average
+    imageStore(TS_PREV1, ipix, vec4(Yt, 0.0, 0.0, 1.0));     // current (possibly mid-band) luma
+    imageStore(TS_PREV2, ipix, vec4(dy_avg, 0.0, 0.0, 1.0)); // running |dy| average
 
     // Output (back to display transfer)
     vec3 out_nl = delinearize(vec4(clamp(rgb_out, vec3(0.0), vec3(1e6)), 1.0)).rgb;
@@ -120,12 +120,12 @@ vec4 hook() {
 }
 
 // Persistent storage images
-//!TEXTURE PREV1
+//!TEXTURE TS_PREV1
 //!SIZE 3840 3840
 //!FORMAT r16f
 //!STORAGE
 
-//!TEXTURE PREV2
+//!TEXTURE TS_PREV2
 //!SIZE 3840 3840
 //!FORMAT r16f
 //!STORAGE

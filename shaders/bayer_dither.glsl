@@ -12,8 +12,8 @@
 //!PARAM bd_amplitude
 //!TYPE float
 //!MINIMUM 0.0
-//!MAXIMUM 0.05
-0.015
+//!MAXIMUM 1.0
+0.05
 
 //!PARAM bd_chroma_offset
 //!TYPE float

@@ -1,26 +1,26 @@
 //!PARAM msh_strength
 //!TYPE float
-0.28
+0.40
 
 //!PARAM msh_clamp_amt
 //!TYPE float
-0.035
+0.038
 
 //!PARAM msh_edge_low
 //!TYPE float
-0.03
+0.02
 
 //!PARAM msh_edge_high
 //!TYPE float
-0.25
+0.24
 
 //!PARAM msh_flat_protect
 //!TYPE float
-0.7
+0.88
 
 //!PARAM msh_motion_gate
 //!TYPE float
-0.5
+0.65
 
 //!HOOK MAIN
 //!BIND HOOKED

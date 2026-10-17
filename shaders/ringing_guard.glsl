@@ -1,6 +1,6 @@
 //!PARAM rg_strength
 //!TYPE float
-1.25
+0.80
 //!PARAM rg_radius
 //!TYPE float
 1.5

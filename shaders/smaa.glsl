@@ -1,6 +1,6 @@
 //!PARAM sma_edge_strength
 //!TYPE float
-0.68
+0.78
 
 //!PARAM sma_corner_strength
 //!TYPE float

@@ -72,13 +72,13 @@ vec4 hook()
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 1.0
-0.12
+0.06
 
 //!PARAM cm_chroma
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 3.0
-1.0
+0.8
 
 //!PARAM cm_halation
 //!TYPE float
@@ -90,7 +90,7 @@ vec4 hook()
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 1.0
-0.15
+0.00
 
 //!PARAM cm_vignette
 //!TYPE float
@@ -102,13 +102,13 @@ vec4 hook()
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 0.05
-0.015
+0.025
 
 //!PARAM cm_black_lift
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 0.05
-0.01
+0.02
 
 //!PARAM cm_brightness
 //!TYPE float

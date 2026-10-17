@@ -12,31 +12,31 @@
 //!TYPE float
 //!MINIMUM 2.0
 //!MAXIMUM 20.0
-4.0
+2.0
 
 //!PARAM sl2_strength
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 1.0
-1.0
+0.5
 
 //!PARAM sl2_dark
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 1.0
-0.80
+0.60
 
 //!PARAM sl2_mid
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 1.0
-0.60
+0.40
 
 //!PARAM sl2_bright
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 1.0
-0.30
+0.15
 
 //!HOOK OUTPUT
 //!BIND HOOKED

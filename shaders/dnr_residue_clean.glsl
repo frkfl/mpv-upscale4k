@@ -47,31 +47,31 @@
 //!TYPE float
 //!MINIMUM 0.005
 //!MAXIMUM 0.15
-0.028
+0.020
 
 //!PARAM dr_chroma_str
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 1.0
-0.70
+0.90
 
 //!PARAM dr_luma_str
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 1.0
-0.40
+0.65
 
 //!PARAM dr_temporal_str
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 1.0
-0.35
+0.20
 
 //!PARAM dr_motion_thr
 //!TYPE float
 //!MINIMUM 0.005
 //!MAXIMUM 0.10
-0.025
+0.020
 
 //!HOOK MAIN
 //!BIND HOOKED

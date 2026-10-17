@@ -1,7 +1,7 @@
 -- Switches profiles based on video-bitrate for width >= 1600.
--- Threshold: 800000 bps (0.8 Mbps).
+-- Threshold: 1000000 bps (1.0 Mbps).
 
-local threshold = 800000
+local threshold = 1000000
 local max_retries = 20  -- 10 seconds max; raw captures have no bitrate, default to HQ
 
 local function apply_profile(bitrate)

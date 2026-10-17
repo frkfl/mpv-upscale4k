@@ -1,14 +1,14 @@
 //!PARAM tbm_base_strength
 //!TYPE float
-0.012
+0.010
 
 //!PARAM tbm_a_low
 //!TYPE float
-0.020
+0.010
 
 //!PARAM tbm_a_high
 //!TYPE float
-0.350
+0.140
 
 //!HOOK MAIN
 //!BIND HOOKED

@@ -1,6 +1,6 @@
 //!PARAM mcb_clean_strength
 //!TYPE float
-1.0
+3.0
 
 //!HOOK MAIN
 //!BIND HOOKED

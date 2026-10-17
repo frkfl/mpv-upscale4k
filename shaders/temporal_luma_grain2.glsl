@@ -2,24 +2,34 @@
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 100.0
-3.0
+10.0
 
 //!PARAM tlg2_motion
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 1.0
-0.3
+0.5
 
 //!HOOK MAIN
 //!BIND HOOKED
-//!BIND PREV1
+//!BIND TLG2_PREV
 //!DESC [Custom] Temporal luma grain 2 (final pass, luma only)
 //!SAVE MAIN
 
+uint wang_hash(uint s) {
+    s ^= s >> 16u; s *= 0x45d9f3bu;
+    s ^= s >> 16u; s *= 0x45d9f3bu;
+    s ^= s >> 16u;
+    return s;
+}
+
+// p.xy are integer pixel coords (from floor), p.z is temporal seed.
+// Wang hash: no spatial correlation, no diagonal bias.
 float hash13(vec3 p) {
-    p = fract(p * 0.1031);
-    p += dot(p, p.yzx + 33.33);
-    return fract((p.x + p.y) * p.z);
+    uint h = wang_hash(uint(p.x))
+           ^ wang_hash(uint(p.y) + 2747636419u)
+           ^ wang_hash(floatBitsToUint(p.z));
+    return float(wang_hash(h)) / 4294967295.0;
 }
 
 float blueNoiseLuma(vec2 uv, float seed) {
@@ -35,10 +45,10 @@ vec4 hook() {
     vec4 src = HOOKED_tex(HOOKED_pos);
     ivec2 pos = ivec2(HOOKED_pos * HOOKED_size);
     if (tlg2_grain <= 0.0) {
-        imageStore(PREV1, pos, vec4(src.rgb, 1.0));
+        imageStore(TLG2_PREV, pos, vec4(src.rgb, 1.0));
         return src;
     }
-    vec4 hist = imageLoad(PREV1, pos);
+    vec4 hist = imageLoad(TLG2_PREV, pos);
     float seed = dot(hist.rgb, vec3(0.3183, 0.1736, 0.4081)) * 4096.0;
     seed += random * 4096.0 * tlg2_motion;
     float luma = dot(src.rgb, vec3(0.299, 0.587, 0.114));
@@ -50,11 +60,11 @@ vec4 hook() {
 
     // Luma-only: add same value to all channels to avoid color shift
     vec3 outc = src.rgb + vec3(g);
-    imageStore(PREV1, pos, vec4(outc, 1.0));
+    imageStore(TLG2_PREV, pos, vec4(outc, 1.0));
     return vec4(outc, src.a);
 }
 
-//!TEXTURE PREV1
+//!TEXTURE TLG2_PREV
 //!SIZE 3840 2160
 //!FORMAT rgba16f
 //!STORAGE

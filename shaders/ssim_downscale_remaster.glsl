@@ -11,12 +11,17 @@
 // Pass 2 (720p): Mitchell full-kernel mean of src^2     -> SSIM2_SQ
 // Pass 3 (720p): variance-preserving SSIM gain          -> SSIM2_OUT
 // Pass 4 (full): Lanczos-3 upscale from SSIM2_OUT       -> output
+//
+// ssim2_crop: removes CRT barrel border before downscale (0 = no crop)
+// ssim2_mix:  0.0 = pure 4K RAVU, 1.0 = pure 720p variance-preserved
+//             sweet spot ~0.35–0.60: 720p character in smooth regions,
+//             4K RAVU structure in detailed areas
 
 //!PARAM ssim2_gain_max
 //!TYPE float
 //!MINIMUM 1.0
 //!MAXIMUM 8.0
-3.0
+1.2
 
 //!PARAM ssim2_eps
 //!TYPE float
@@ -28,7 +33,13 @@
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 0.10
-0.03
+0.00
+
+//!PARAM ssim2_mix
+//!TYPE float
+//!MINIMUM 0.0
+//!MAXIMUM 1.0
+0.90
 
 //!HOOK MAIN
 //!BIND HOOKED
@@ -159,7 +170,7 @@ vec4 hook() {
 //!HOOK MAIN
 //!BIND HOOKED
 //!BIND SSIM2_OUT
-//!DESC [SSIM2] Lanczos-3 upscale to output
+//!DESC [SSIM2] Blend 720p variance-preserved + 4K RAVU base
 
 float sinc(float x) {
     if (abs(x) < 1e-5) return 1.0;
@@ -173,12 +184,12 @@ float lanczos3(float x) {
 }
 
 vec4 hook() {
-    // Map output pixel into SSIM2_OUT (720p) texel space
+    // --- 720p result: Lanczos-3 upscale of the variance-preserved 720p image ---
     vec2 src = HOOKED_pos * SSIM2_OUT_size - 0.5;
     vec2 f   = fract(src);
     vec2 c   = floor(src);
 
-    vec3  col = vec3(0.0);
+    vec3  lo  = vec3(0.0);
     float W   = 0.0;
 
     for (int y = -2; y <= 3; y++) {
@@ -186,9 +197,15 @@ vec4 hook() {
             vec2 tap = c + vec2(float(x), float(y));
             vec2 tc  = (tap + 0.5) * SSIM2_OUT_pt;
             float w  = lanczos3(float(x) - f.x) * lanczos3(float(y) - f.y);
-            col += SSIM2_OUT_tex(tc).rgb * w;
-            W   += w;
+            lo += SSIM2_OUT_tex(tc).rgb * w;
+            W  += w;
         }
     }
-    return vec4(clamp(col / max(W, 1e-6), 0.0, 1.0), 1.0);
+    lo = clamp(lo / max(W, 1e-6), 0.0, 1.0);
+
+    // --- 4K result: the RAVU-upscaled base at full resolution ---
+    vec3 hi = HOOKED_tex(HOOKED_pos).rgb;
+
+    // --- Blend: ssim2_mix=0 → pure 4K RAVU, ssim2_mix=1 → pure 720p painted look ---
+    return vec4(mix(hi, lo, ssim2_mix), 1.0);
 }

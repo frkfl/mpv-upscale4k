@@ -1,6 +1,6 @@
 //!PARAM fmtr_clean
 //!TYPE float
-0.0
+0.60
 
 //!HOOK MAIN
 //!BIND HOOKED

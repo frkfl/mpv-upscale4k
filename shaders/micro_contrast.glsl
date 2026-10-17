@@ -1,10 +1,10 @@
 //!PARAM mc_radius
 //!TYPE float
-1.0
+0.8
 
 //!PARAM mc_amount
 //!TYPE float
-0.12
+0.22
 
 //!PARAM mc_threshold
 //!TYPE float

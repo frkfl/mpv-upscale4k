@@ -33,19 +33,19 @@
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 0.95
-0.75
+0.65
 
 //!PARAM ss_strength
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 1.0
-0.85
+0.80
 
 //!PARAM ss_motion_thr
 //!TYPE float
 //!MINIMUM 0.002
 //!MAXIMUM 0.10
-0.018
+0.012
 
 //!PARAM ss_luma_lo
 //!TYPE float

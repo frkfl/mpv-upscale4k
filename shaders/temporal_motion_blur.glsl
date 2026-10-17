@@ -2,7 +2,7 @@
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 1.0
-0.5
+0.2
 
 //!PARAM tmb_motion_lo
 //!TYPE float
@@ -36,8 +36,8 @@
 
 //!HOOK MAIN
 //!BIND HOOKED
-//!BIND PREV1
-//!BIND PREV2
+//!BIND TMB_PREV1
+//!BIND TMB_PREV2
 //!DESC [Custom] Temporal Motion Blur
 
 const vec3  W2020 = vec3(0.2627, 0.6780, 0.0593);
@@ -49,8 +49,8 @@ vec4 hook() {
     float Y_cur = dot(cur, W2020);
 
     // Read previous frame luma and motion EMA — own position only, no hazard
-    float Y_prev  = (frame == 0) ? Y_cur  : imageLoad(PREV1, ipix).r;
-    float M_avg   = (frame == 0) ? 0.0    : imageLoad(PREV2, ipix).r;
+    float Y_prev  = (frame == 0) ? Y_cur  : imageLoad(TMB_PREV1, ipix).r;
+    float M_avg   = (frame == 0) ? 0.0    : imageLoad(TMB_PREV2, ipix).r;
 
     float motion  = abs(Y_cur - Y_prev);
 
@@ -80,18 +80,18 @@ vec4 hook() {
     vec3  rgb_out = clamp(mix(cur, spatial, blend), 0.0, 1.0);
 
     // Persist for next frame — own position only
-    imageStore(PREV1, ipix, vec4(Y_cur,     0.0, 0.0, 1.0));
-    imageStore(PREV2, ipix, vec4(M_avg_new, 0.0, 0.0, 1.0));
+    imageStore(TMB_PREV1, ipix, vec4(Y_cur,     0.0, 0.0, 1.0));
+    imageStore(TMB_PREV2, ipix, vec4(M_avg_new, 0.0, 0.0, 1.0));
 
     return vec4(rgb_out, 1.0);
 }
 
-//!TEXTURE PREV1
+//!TEXTURE TMB_PREV1
 //!SIZE 3840 3840
 //!FORMAT r16f
 //!STORAGE
 
-//!TEXTURE PREV2
+//!TEXTURE TMB_PREV2
 //!SIZE 3840 3840
 //!FORMAT r16f
 //!STORAGE

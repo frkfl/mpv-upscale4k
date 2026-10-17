@@ -1,38 +1,38 @@
 //!PARAM eprv_strength
 //!TYPE float
-1.0
+2.0
 
 //!PARAM eprv_edge_gain
 //!TYPE float
-1.0
+4.0
 
 //!PARAM eprv_edge_exp
 //!TYPE float
-1.0
+3.0
 
 //!PARAM eprv_phase_max
 //!TYPE float
-0.6
+0.8
 
 //!PARAM eprv_amp_norm
 //!TYPE float
-0.35
+0.5
 
 //!PARAM eprv_tangential_smooth
 //!TYPE float
-0.45
+0.5
 
 //!PARAM eprv_temporal_alpha
 //!TYPE float
-1.0
+0.3
 
 //!PARAM eprv_global_gain
 //!TYPE float
-1.0
+3.0
 
 //!PARAM eprv_skin_protect
 //!TYPE float
-0.5
+0.0
 
 //!HOOK POSTKERNEL
 //!BIND HOOKED

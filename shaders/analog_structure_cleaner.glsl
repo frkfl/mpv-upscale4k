@@ -157,13 +157,13 @@ vec4 hook() {
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 1.0
-0.5
+0.8
 
 //!PARAM asc_sharpen
 //!TYPE float
 //!MINIMUM 0.0
 //!MAXIMUM 2.0
-0.6
+0.7
 
 //!PARAM asc_edge_lo
 //!TYPE float

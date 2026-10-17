@@ -1,30 +1,30 @@
 //!PARAM nf_th_low
 //!TYPE float
-0.035
+0.030
 //!PARAM nf_th_high
 //!TYPE float
-0.12
+0.10
 //!PARAM nf_shift_px
 //!TYPE float
-0.75
+0.80
 //!PARAM nf_k_strength
 //!TYPE float
-0.50
+0.58
 //!PARAM nf_alpha_yfb
 //!TYPE float
-0.10
+0.12
 //!PARAM nf_beta_cfb
 //!TYPE float
-0.02
+0.025
 //!PARAM nf_blur_sigma
 //!TYPE float
-1.20
+0.95
 //!PARAM nf_protect_gate
 //!TYPE float
-0.70
+0.72
 //!PARAM nf_shadow_thresh
 //!TYPE float
-0.05
+0.045
 //!PARAM nf_knee_gain
 //!TYPE float
 1.0
@@ -33,19 +33,19 @@
 0.15
 //!PARAM nf_ema_high
 //!TYPE float
-0.60
+0.55
 //!PARAM nf_motion_thr
 //!TYPE float
 0.03
 //!PARAM nf_s_chroma_protect
 //!TYPE float
-0.70
+0.75
 //!PARAM nf_e_ref
 //!TYPE float
 0.08
 //!PARAM nf_max_desat
 //!TYPE float
-0.30
+0.28
 
 //!HOOK MAIN
 //!BIND HOOKED

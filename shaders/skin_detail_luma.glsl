@@ -2,7 +2,7 @@
 
 //!PARAM sdl_strength
 //!TYPE float
-0.18
+0.30
 
 //!PARAM sdl_skin_hue
 //!TYPE float
