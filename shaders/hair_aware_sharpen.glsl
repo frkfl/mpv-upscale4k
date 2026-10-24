@@ -18,7 +18,7 @@
 //!TYPE float
 0.030
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!BIND PREV
 //!DESC [Custom] Hair-aware adaptive sharpen

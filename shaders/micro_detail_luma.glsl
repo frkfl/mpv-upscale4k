@@ -8,7 +8,7 @@
 //!TYPE float
 0.004
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!DESC [Custom] Micro-detail Enhancer
 

@@ -22,7 +22,7 @@
 //!TYPE float
 0.65
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!BIND PREV
 //!DESC [Custom] Masked anti-halo luma-only sharpen with motion gating

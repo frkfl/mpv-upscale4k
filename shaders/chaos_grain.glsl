@@ -15,7 +15,7 @@
 //!PARAM cg_strength
 //!TYPE float
 //!MINIMUM 0.0
-//!MAXIMUM 0.30
+//!MAXIMUM 1.0
 0.03
 
 //!HOOK OUTPUT

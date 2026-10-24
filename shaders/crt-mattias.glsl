@@ -16,7 +16,7 @@
 //!MAXIMUM 8.0
 2.0
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!SAVE CRT_BLUR
 //!DESC [CRT organic] Bloom blur
@@ -116,7 +116,7 @@ vec4 hook()
 //!MAXIMUM 2.0
 1.0
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!BIND CRT_BLUR
 //!DESC [CRT organic] Render

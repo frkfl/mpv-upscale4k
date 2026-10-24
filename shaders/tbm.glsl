@@ -10,7 +10,7 @@
 //!TYPE float
 0.140
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!DESC [Custom] Texture Balance Map
 

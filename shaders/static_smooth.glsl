@@ -71,7 +71,7 @@
 //!MAXIMUM 1.0
 0.80
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!BIND SS_PREV
 //!DESC [Custom] Static-zone temporal smooth

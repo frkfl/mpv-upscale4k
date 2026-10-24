@@ -27,7 +27,7 @@
 //!MAXIMUM 1.0
 0.5
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!DESC [CRT] Bayer RGB dither
 

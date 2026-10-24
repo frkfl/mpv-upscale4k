@@ -73,7 +73,7 @@
 //!MAXIMUM 0.10
 0.020
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!BIND DR_PREV
 //!DESC [Custom] DNR residue — chroma/luma stabilizer
@@ -163,8 +163,8 @@ vec4 hook() {
     float YnMean  = YnAcc / 8.0;
     float YnRange = YnMax - YnMin;
     float devY    = abs(Y - YnMean);
-    float smooth  = 1.0 - smoothstep(0.04, 0.10, YnRange);   // 0 at edge, 1 in flat region
-    float outlier = smoothstep(0.018, 0.040, devY) * smooth;
+    float flat_gate = 1.0 - smoothstep(0.04, 0.10, YnRange);   // 0 at edge, 1 in flat region
+    float outlier   = smoothstep(0.018, 0.040, devY) * flat_gate;
     float Y_out   = mix(Y, YnMean, outlier * dr_luma_str);
 
     // ------------------------------------------------------------------

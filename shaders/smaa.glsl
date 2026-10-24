@@ -10,7 +10,7 @@
 //!TYPE float
 1.0
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!DESC [Custom] SMAA Anti Aliasing
 

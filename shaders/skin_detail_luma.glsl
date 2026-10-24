@@ -24,7 +24,7 @@
 //!TYPE float
 0.55
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!DESC [Custom] Skin Detail Enhancer
 

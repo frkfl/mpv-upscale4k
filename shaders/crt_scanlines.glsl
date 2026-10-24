@@ -58,7 +58,7 @@
 //!MAXIMUM 2.0
 1.0
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!DESC [CRT] Scanlines symmetric
 

@@ -34,7 +34,7 @@
 //!TYPE float
 0.0
 
-//!HOOK POSTKERNEL
+//!HOOK MAIN
 //!BIND HOOKED
 //!BIND PREV
 //!DESC [Custom] Edge Stabilization & Perceptual Phase Re-Alignment v2 (deterministic, perceptually tunable)

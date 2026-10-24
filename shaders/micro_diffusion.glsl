@@ -22,7 +22,7 @@
 //!MAXIMUM 2.0
 1.2
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!DESC [Custom] Micro Diffusion (Smoothing)
 //!SAVE MAIN

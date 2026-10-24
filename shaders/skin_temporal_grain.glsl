@@ -16,7 +16,7 @@
 //!MAXIMUM 5.0
 1.0
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!BIND STG_PREV
 //!DESC [Custom] Skin temporal luma grain

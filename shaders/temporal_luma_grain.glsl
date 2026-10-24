@@ -10,7 +10,7 @@
 //!MAXIMUM 1.0
 0.5
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!BIND TLG_PREV
 //!DESC [Custom] Temporal luma grain

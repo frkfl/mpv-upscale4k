@@ -46,7 +46,7 @@
 //!MAXIMUM 6.0
 3.0
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!DESC [CRT] Phosphor texture
 

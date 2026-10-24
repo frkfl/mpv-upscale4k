@@ -4,7 +4,7 @@
 //!MAXIMUM 6.0
 0.01
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!DESC [Custom] Gaussian blur
 

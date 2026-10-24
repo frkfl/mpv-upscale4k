@@ -26,7 +26,7 @@
 //!TYPE float
 0.02
 
-//!HOOK MAIN
+//!HOOK OUTPUT
 //!BIND HOOKED
 //!DESC [Custom] Unified anti-ringing
 
