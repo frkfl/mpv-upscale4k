@@ -37,14 +37,23 @@ vec4 hook() {
         // bpos.x ≥ 4 → second half          → boundary is to the RIGHT → sx = +1
         float sx    = (bpos.x < 4.0) ? -1.0 : 1.0;
         float nb    = HOOKED_tex(uv + vec2(sx * pt.x, 0.0)).r;
-        float blend = step(abs(luma - nb), dcld_threshold) * dcld_strength;
+        float diff  = abs(luma - nb);
+        // Proportional: zero at zero step, rises through artifact range, cuts off at threshold.
+        // step() was previously used — it applied FULL blend for any diff below threshold,
+        // including near-zero natural gradients, producing consistent bright horizontal lines.
+        float blend = smoothstep(0.0, dcld_threshold, diff)
+                    * step(diff, dcld_threshold)
+                    * dcld_strength;
         result = mix(result, (luma + nb) * 0.5, blend);
     }
 
     if (dv < 1.5) {
         float sy    = (bpos.y < 4.0) ? -1.0 : 1.0;
         float nb    = HOOKED_tex(uv + vec2(0.0, sy * pt.y)).r;
-        float blend = step(abs(result - nb), dcld_threshold) * dcld_strength;
+        float diff  = abs(result - nb);
+        float blend = smoothstep(0.0, dcld_threshold, diff)
+                    * step(diff, dcld_threshold)
+                    * dcld_strength;
         result = mix(result, (result + nb) * 0.5, blend);
     }
 
