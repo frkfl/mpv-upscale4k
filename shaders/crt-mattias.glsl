@@ -104,6 +104,30 @@ vec4 hook()
 //!MAXIMUM 0.05
 0.025
 
+//!PARAM cm_noise_lo
+//!TYPE float
+//!MINIMUM 0.0
+//!MAXIMUM 1.0
+0.70
+
+//!PARAM cm_noise_hi
+//!TYPE float
+//!MINIMUM 0.0
+//!MAXIMUM 1.0
+0.90
+
+//!PARAM cm_halation_lo
+//!TYPE float
+//!MINIMUM 0.0
+//!MAXIMUM 1.0
+0.70
+
+//!PARAM cm_halation_hi
+//!TYPE float
+//!MINIMUM 0.0
+//!MAXIMUM 1.0
+0.92
+
 //!PARAM cm_black_lift
 //!TYPE float
 //!MINIMUM 0.0
@@ -198,9 +222,13 @@ vec4 hook()
          0.3*sin(t*0.80)
     )) * vec3(0.25, 0.25, 0.5);
 
-    col += cm_halation * bloom_r * gate;
-    col += cm_halation * bloom_g * gate;
-    col += cm_halation * bloom_b * gate;
+    // Protect highlights from halation self-absorption: bright light sources
+    // would otherwise blend their blurred warmth back into themselves, destroying
+    // texture and creating a uniform blown colour. Gate cuts halation at high luma.
+    float halation_protect = 1.0 - smoothstep(cm_halation_lo, cm_halation_hi, luma);
+    col += cm_halation * halation_protect * bloom_r * gate;
+    col += cm_halation * halation_protect * bloom_g * gate;
+    col += cm_halation * halation_protect * bloom_b * gate;
 
     // Gentle S-curve contrast in gamma space — color-neutral, no clipping.
     col = scurve(clamp(col, 0.0, 1.0), cm_contrast);
@@ -227,9 +255,11 @@ vec4 hook()
     // the average luminance loss without fighting the spatial shape of the vignette.
     col *= cm_brightness;
 
-    // Noise
+    // Noise — gated out in highlights to prevent per-channel chroma noise
+    // from pushing bright texture into the DNR noise floor
+    float noise_gate = 1.0 - smoothstep(cm_noise_lo, cm_noise_hi, luma);
     vec2 seed = curved * resolution;
-    col -= cm_noise * pow(vec3(
+    col -= cm_noise * noise_gate * pow(vec3(
         rand(seed + time),
         rand(seed + time * 2.0),
         rand(seed + time * 3.0)
