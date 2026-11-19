@@ -1,12 +1,8 @@
-// Luma Clarity — mid-frequency local contrast enhancement.
+// Luma Clarity: mid-frequency local contrast enhancement.
 //
 // Large-radius unsharp mask on the luma channel only.
 // Enhances the 3D form and surface variation (faces, folds, depth) without
 // sharpening edges or adding color shifts.
-//
-// This is the complement to downscale-remaster smoothing: the remaster calms
-// high-frequency chaos; clarity brings back the mid-frequency "opinion" on luma
-// that makes surfaces feel solid rather than flat.
 //
 // lc_strength: 0.0 = off, 0.25 = subtle punch, 0.5 = strong.
 // lc_radius:   feature scale in output pixels. 6 = skin texture, 12 = face form.

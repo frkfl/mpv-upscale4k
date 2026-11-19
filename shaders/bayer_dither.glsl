@@ -1,9 +1,4 @@
 // Bayer 8x8 ordered RGB dither.
-// Applies structured chromatic dither to break flat digital appearance.
-// R/G/B channels are offset horizontally within the Bayer matrix to
-// simulate CRT phosphor triad spacing at sub-pixel scale.
-// At 4K the 8px matrix period is below visual acuity at viewing distance;
-// downstream grain shuffles the static geometry frame to frame.
 //
 // bd_amplitude:     dither strength in linear light (~0.01 subtle, 0.02 visible)
 // bd_chroma_offset: horizontal Bayer offset per channel (0 = luma-only, 2 = triad)

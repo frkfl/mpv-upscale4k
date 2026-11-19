@@ -22,7 +22,7 @@
 
 //!HOOK MAIN
 //!BIND HOOKED
-//!DESC [Custom] Hi8 vertical stripe deblocker - Blur across uncorrelated pixel boundaries
+//!DESC [Custom] Hi8 vertical stripe blurring
 
 const vec3  W2020 = vec3(0.2627, 0.6780, 0.0593);
 const float EPS   = 1e-6;

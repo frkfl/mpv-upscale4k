@@ -22,9 +22,8 @@
 //
 // The middle ground (P ≈ 0.5) gets neither action — the shader stays hands-off.
 
-// ════════════════════════════════════════════════════════════════════════════
-// PASS 1 — Classify: compute clarity map
-// ════════════════════════════════════════════════════════════════════════════
+
+// PASS 1, classify: compute clarity map
 
 //!PARAM asc_sigma
 //!TYPE float
@@ -149,9 +148,7 @@ vec4 hook() {
     return vec4(P, dir.x * 0.5 + 0.5, dir.y * 0.5 + 0.5, 1.0);
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// PASS 2 — Apply: clean noise + reinforce real edges
-// ════════════════════════════════════════════════════════════════════════════
+// PASS 2, apply: clean noise + reinforce real edges
 
 //!PARAM asc_clean
 //!TYPE float
@@ -191,7 +188,7 @@ vec4 hook() {
     vec2 uv = HOOKED_pos;
     vec2 px = 1.0 / HOOKED_size.xy;
 
-    // ── Unpack classification ─────────────────────────────────────────────
+    // Unpack classification
     vec4  map = ASC_MAP_tex(ASC_MAP_pos);
     float P   = map.r;
     vec2  dir = map.gb * 2.0 - 1.0;   // unpack [-1, 1]
@@ -199,14 +196,14 @@ vec4 hook() {
     vec3  rgb = HOOKED_tex(uv).rgb;
     float Y   = luma2(rgb);
 
-    // ── Gradient magnitude (recomputed, cheap) ────────────────────────────
+    // Gradient magnitude
     float Yr = luma2(HOOKED_tex(uv + vec2(px.x, 0.0)).rgb);
     float Yl = luma2(HOOKED_tex(uv - vec2(px.x, 0.0)).rgb);
     float Yu = luma2(HOOKED_tex(uv + vec2(0.0, px.y)).rgb);
     float Yd = luma2(HOOKED_tex(uv - vec2(0.0, px.y)).rgb);
     float m  = 0.5 * length(vec2(Yr - Yl, Yu - Yd));
 
-    // ── ACTION 1: Clean noise interiors ──────────────────────────────────
+    // ACTION 1: Clean noise interiors
     // Smooth perpendicular to the gradient direction.
     // This diffuses across the fake "edge" created by the noise,
     // reducing it without touching real edges (where P is low).
@@ -218,7 +215,7 @@ vec4 hook() {
     // Blend toward smooth proportional to P (noise) × user strength
     vec3 rgb_clean  = mix(rgb, rgb_smooth, P * asc_clean);
 
-    // ── ACTION 2: Reinforce real edges ────────────────────────────────────
+    // ACTION 2: Reinforce real edges
     // At real edge midpoints the second derivative along the gradient
     // direction (Ypp) is non-zero. Subtracting it from luma boosts
     // contrast at the edge — equivalent to directional unsharp masking.

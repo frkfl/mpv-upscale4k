@@ -20,7 +20,7 @@
 
 //!HOOK OUTPUT
 //!BIND HOOKED
-//!DESC [Custom] Chaos grain (Aliens-style)
+//!DESC [Custom] Chaos grain
 
 uint wang_hash(uint s) {
     s ^= s >> 16u; s *= 0x45d9f3bu;
