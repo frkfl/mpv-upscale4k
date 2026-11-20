@@ -93,7 +93,9 @@ This lets you instantly compare:
 
 ## DVD Results
 
-Virtually nothing just display the result of the codec: VLC heavily tamper with colors and framerate, dvd player devices largely rework the result. Originally, the format was made for display on CRT through SCART or worth. So it is hard to give a "before" that people will mistake for a director's intent.
+Originally, the format was made to look good on a CRT TV through SCART, or worst. So, virtually nothing just displays the result of the codec on a LCD display: VLC heavily tampers with colors and framerate interpolation, dvd player devices largely rework the result. So giving a "before" is genuinely hard, and most certainly not the director's intent.
+
+To me, what matters is that it is not plastic, with clear colors, and details that really are on the DVD, for a result that feels resolution-less in 4K, rather than 4K.
 
 | Movie                        | Picture                                                                                                                                |
 | :--------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
