@@ -16,11 +16,10 @@
 ### 🧭 Overview
 
 It is a collection of GLSL shaders and profiles for **mpv** that upscale to 4K.
-
-Depending on the original quality and resolution, they goal vary between
-
-- A more watchable experience when the source is so bad that 4K would full-screen normally hurts the result
-- A good, detailed experience in 4K as the the source gets closer to a good Full HD video.
+The goal is to have the best viewing experience on a 4K monitor, for any source resolution and bitrate.
+A DVD will not become a UHD Blu-Ray, it will hold with good colors, very little noise, a subtle noise that feels like an optical zoom.
+A mediocre 1080p web-dl will get a cleaner, more detailed image that feels higher bitrate.
+A Blu-Ray will feel 4K even if not as detailed as a UHD.
 
 ---
 
@@ -92,6 +91,15 @@ This lets you instantly compare:
 - the original player output
 - the result of this project improvements
 
+## DVD Results
+
+| Movie                        | Picture                                                                |
+| :--------------------------- | :--------------------------------------------------------------------- |
+| Dune 1984                    | ![Dune2](~/sample/dvd-Dune 1984-00:05:42.220-0001.png)                 |
+| Phantom of the Paradise 1974 | ![Phantom](~/sample/dvd-Phantom of the paradise-00:10:07.440-0001.png) |
+| Tinkerbell 2008              | ![Dune2](~/sample/dvd-La fee Clochette-00:20:45.300-0001.png)          |
+| Seven 1995                   | ![Dune2](~/sample/dvd-Se7en-01:56:52.839-0001.png)                     |
+
 ## 📜 License
 
 All shaders and configs are released under the MIT License.
@@ -101,7 +109,10 @@ You may freely copy, modify, and redistribute — credit appreciated but not req
 
 ## 💡 Credits
 
-Shader math inspired by FSRCNNX, SSimSuperRes, and Björn Ottosson’s OkLab.
+Shader math inspired by FSRCNNX, SSimSuperRes, and Björn Ottosson’s OkLab for color space normalization.
+Also Matthias Gustavsson for the CRT emulation that really improved the analog feel on DVD.
+João Chrisóstomo for Chroma from Luma that is so major for 4:2:0 sources like DVD.
+And many other people and shaders in ~/shaders-dl.
 
 ## Specs
 

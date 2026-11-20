@@ -167,13 +167,11 @@ vec4 hook() {
     float outlier   = smoothstep(0.018, 0.040, devY) * flat_gate;
     float Y_out   = mix(Y, YnMean, outlier * dr_luma_str);
 
-    // ------------------------------------------------------------------
     // Temporal chroma EMA
     // PREV stores [Y, Cb_out, Cr_out] from the previous processed frame.
     // Only blends in:
     //   - static regions (luma motion below threshold)
     //   - small-amplitude chroma changes (the DNR oscillation character)
-    // ------------------------------------------------------------------
     if (frame > 0) {
         vec4  prev    = imageLoad(DR_PREV, ipix);
         float Y_prev  = prev.r;
@@ -196,9 +194,7 @@ vec4 hook() {
         Cr_out = mix(Cr_out, Cr_prev, blend);
     }
 
-    // ------------------------------------------------------------------
     // Reconstruct + persist
-    // ------------------------------------------------------------------
     vec3 rgb_out = YCC_TO_RGB * vec3(Y_out, Cb_out, Cr_out);
 
     // Store current processed [Y, Cb, Cr] for next frame's temporal gate
