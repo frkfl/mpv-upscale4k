@@ -114,7 +114,7 @@ Again, it is hard to compare to a "source". For example Aliens' BR has some fine
 ## 📜 License
 
 All shaders and configs are released under the MIT License.
-You may freely copy, modify, and redistribute — credit appreciated but not required.
+You may freely copy, modify, and redistribute. Credit appreciated but not required for my own shaders (~/shaders/). For the others, see their content.
 
 ---
 
@@ -127,4 +127,5 @@ And many other people and shaders in ~/shaders-dl.
 
 ## Specs
 
-Tested on RTX 3080 / mpv-gpu-next Vulkan backend
+Tested on a RTX 3080 / mpv-gpu-next Vulkan backend.
+The GPU usage goes up to 60%. It could be cut a lot, especially for lower resolutions where temporal sharpen are not that relevant.
