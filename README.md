@@ -93,12 +93,14 @@ This lets you instantly compare:
 
 ## DVD Results
 
-| Movie                        | Picture                                                                |
-| :--------------------------- | :--------------------------------------------------------------------- |
-| Dune 1984                    | ![Dune 1984](https://raw.githubusercontent.com/frkfl/mpv-upscale4k/main/samples/dvd-Dune%201984-00:05:42.220-0001.png)               |
+Virtually nothing just display the result of the codec: VLC heavily tamper with colors and framerate, dvd player devices largely rework the result. Originally, the format was made for display on CRT through SCART or worth. So it is hard to give a "before" that people will mistake for a director's intent.
+
+| Movie                        | Picture                                                                                                                                |
+| :--------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
+| Dune 1984                    | ![Dune 1984](https://raw.githubusercontent.com/frkfl/mpv-upscale4k/main/samples/dvd-Dune%201984-00:05:42.220-0001.png)                 |
 | Phantom of the Paradise 1974 | ![Phantom](https://raw.githubusercontent.com/frkfl/mpv-upscale4k/main/samples/dvd-Phantom%20of%20the%20paradise-00:10:07.440-0001.png) |
-| Tinkerbell 2008              | ![Tinkerbell](https://raw.githubusercontent.com/frkfl/mpv-upscale4k/main/samples/dvd-La%20fee%20Clochette-00:20:45.300-0001.png)          |
-| Seven 1995                   | ![Dune2](https://raw.githubusercontent.com/frkfl/mpv-upscale4k/main/samples/dvd-Se7en-01:56:52.839-0001.png)                     |
+| Tinkerbell 2008              | ![Tinkerbell](https://raw.githubusercontent.com/frkfl/mpv-upscale4k/main/samples/dvd-La%20fee%20Clochette-00:20:45.300-0001.png)       |
+| Seven 1995                   | ![Dune2](https://raw.githubusercontent.com/frkfl/mpv-upscale4k/main/samples/dvd-Se7en-01:56:52.839-0001.png)                           |
 
 ## 📜 License
 
