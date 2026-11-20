@@ -96,6 +96,7 @@ This lets you instantly compare:
 Originally, the format was made to look good on a CRT TV through SCART, or worst. So, virtually nothing just displays the result of the codec on a LCD display: VLC heavily tampers with colors and framerate interpolation, dvd player devices largely rework the result. So giving a "before" is genuinely hard, and most certainly not the director's intent.
 
 To me, what matters is that it is not plastic, with clear colors, and details that really are on the DVD, for a result that feels resolution-less in 4K, rather than 4K.
+Obligatory, it looks much better in motion.
 
 | Movie                        | Picture                                                                                                                                |
 | :--------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
@@ -103,6 +104,12 @@ To me, what matters is that it is not plastic, with clear colors, and details th
 | Phantom of the Paradise 1974 | ![Phantom](https://raw.githubusercontent.com/frkfl/mpv-upscale4k/main/samples/dvd-Phantom%20of%20the%20paradise-00:10:07.440-0001.png) |
 | Tinkerbell 2008              | ![Tinkerbell](https://raw.githubusercontent.com/frkfl/mpv-upscale4k/main/samples/dvd-La%20fee%20Clochette-00:20:45.300-0001.png)       |
 | Seven 1995                   | ![Dune2](https://raw.githubusercontent.com/frkfl/mpv-upscale4k/main/samples/dvd-Se7en-01:56:52.839-0001.png)                           |
+
+## 1080p
+
+The improvement is real, but debatable. Give it a test. I have a profile for BR's bitrate, and one for web-dl. It will switch automatically.
+
+Again, it is hard to compare to a "source". For example Aliens' BR has some fine digital grain on a cleaned pictured. It was already criticized, despite being supervised by Cameron. Anyway, in 4K, the 2K trick fails as the pixel size noise is blurred with a bicubic or equivalent. And that looks bad on my monitor but that does not matter on my LG TV, because even if you deactivate every processing, a temporal cleaning remove them, and destroys pans. I do believe I have a much better result with my shaders as I don't rely on a single trick.
 
 ## 📜 License
 
