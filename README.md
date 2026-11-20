@@ -95,7 +95,7 @@ This lets you instantly compare:
 
 | Movie                        | Picture                                                                |
 | :--------------------------- | :--------------------------------------------------------------------- |
-| Dune 1984                    | ![[Dune2](https://github.com/frkfl/mpv-upscale4k/blob/main/samples/dvd-Dune%201984-00:05:42.220-0001.png?raw=true)                 |
+| Dune 1984                    | ![Dune 1984](https://raw.githubusercontent.com/frkfl/mpv-upscale4k/main/samples/dvd-Dune%201984-00:05:42.220-0001.png)               |
 | Phantom of the Paradise 1974 | ![Phantom](~/sample/dvd-Phantom of the paradise-00:10:07.440-0001.png) |
 | Tinkerbell 2008              | ![Dune2](~/sample/dvd-La fee Clochette-00:20:45.300-0001.png)          |
 | Seven 1995                   | ![Dune2](~/sample/dvd-Se7en-01:56:52.839-0001.png)                     |
